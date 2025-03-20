@@ -5,6 +5,7 @@ interface IMail extends Document {
     from: string;
     to: string;
     body: string;
+    blobId: string;
     date?: Date;
 }
 
@@ -13,6 +14,7 @@ const MailSchema: Schema = new Schema({
     from: {type: String, required: true, unique: true},
     to: {type: String, required: true, unique: true},
     body: {type: String, required: true},
+    blobId: {type: String, required: true},
     date: {type: Date, default: Date.now}
 }) 
 
