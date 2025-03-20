@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import connectDB from './config/db';
 import authRouter from "./routes/authRoutes";
 import mailRouter from "./routes/mailRoutes";
+import { setupSwaggerDocs } from "./config/swagger";
 
 connectDB();
 
@@ -11,6 +12,8 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+setupSwaggerDocs(app); // Add Swagger setup
 
 app.get("/", (req: Request, res: Response) => {
     res.json({ message: "Welcome to the Express + TypeScript Server!" });
