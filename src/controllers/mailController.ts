@@ -1,18 +1,23 @@
 import { Request, RequestHandler, Response } from 'express';
 import Mail from '../models/Mail';
 import { sendToWalrus, getFromWalrus } from '../utils/walrus';
+import { encryptData, decryptData } from '../utils/encryption';
 
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
+    const { from, to, subject, body } = req.body;
     try {
-        const newMail = new Mail(req.body);
-        const payload = JSON.stringify(newMail.body);
+        // const newMail = new Mail(req.body);
+        const encryptedBody = encryptData(body);
+        const payload = JSON.stringify(body);
         console.log('Payload:', payload);
-
+        
         const walrusBlob = await sendToWalrus(payload);
         const blobId = walrusBlob.newlyCreated.blobObject.blobId;
 
+        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId });
+
         const savedMail = await newMail.save();
-        res.status(200).json(savedMail);
+        res.status(200).json({ savedMail, blobId });
     } catch (error) {
         res.status(500).json({ error: 'Failed to sendMail' });
     }
@@ -57,4 +62,4 @@ const fetchMessage: RequestHandler = async (req: Request, res: Response) => {
 
 
 
-export { sendMail, fetchInbox, fetchOutbox };
+export { sendMail, fetchInbox, fetchOutbox, fetchMessage };
