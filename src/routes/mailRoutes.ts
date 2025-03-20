@@ -9,7 +9,7 @@ const mailRouter = express.Router();
 mailRouter.post('/sendMail', authMiddleware, sendMail);
 mailRouter.get('/inbox/:to', authMiddleware, inboxMiddleware, fetchInbox);
 mailRouter.get('/outbox/:from', authMiddleware, outboxMiddleware, fetchOutbox);
-mailRouter.get('/inboxMessage/:id', authMiddleware, inboxMiddleware, fetchMessage);
-mailRouter.get('/outboxMessage/:id', authMiddleware, outboxMiddleware, fetchMessage);
+mailRouter.get('/inboxMessage/:to/:id', authMiddleware, inboxMiddleware, fetchMessage);
+mailRouter.get('/outboxMessage/:from/:id', authMiddleware, outboxMiddleware, fetchMessage);
 
 export default mailRouter;
