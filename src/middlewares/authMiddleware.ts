@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 
-dotenv.config();
+// dotenv.config();
 
 // Extend the Request interface to include the 'user' property
 declare global {
@@ -14,14 +14,14 @@ declare global {
 }
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '') as string;
+    const token = req.header('Authorization') as string;
 
     if (!token) {
         res.status(401).json({ error: 'No token provided, authorization denied' });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwtsecret');
+        const decoded = jwt.verify(token, 'jwtsecret');
         req.user = decoded as unknown as { address: string };
         next();
     } catch (error) {

@@ -58,7 +58,7 @@ mailRouter.post('/sendMail', authMiddleware, sendMail);
  *       500:
  *         description: Failed to fetch inbox
  */
-mailRouter.get('/inbox/:to', authMiddleware, inboxMiddleware, fetchInbox);
+mailRouter.get('/inbox/:to',authMiddleware , inboxMiddleware, fetchInbox);
 
 /**
  * @swagger

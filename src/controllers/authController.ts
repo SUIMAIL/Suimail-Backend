@@ -14,7 +14,7 @@ const login: RequestHandler = async (req: Request, res: Response) => {
             await newUser.save();
         }
 
-        const token = jwt.sign({ address }, process.env.JWT_SECRET || 'jwtsecret', {
+        const token = jwt.sign({ address }, 'jwtsecret' , {
             expiresIn: '1d',
         });
 
