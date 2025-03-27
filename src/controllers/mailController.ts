@@ -7,10 +7,10 @@ const sendMail: RequestHandler = async (req: Request, res: Response) => {
     const { from, to, subject, body } = req.body;
     try {
         const encryptedBody = encryptData(body);
-        const payload = JSON.stringify(`${encryptedBody}!+_id_+!${Date.now()}`);
+        const payload = `${encryptedBody}!!!${Date.now()}`;
         console.log('Payload:', payload);
 
-        const walrusBlob = await sendToWalrus(encryptedBody);
+        const walrusBlob = await sendToWalrus(payload);
         const blobId = walrusBlob.newlyCreated.blobObject.blobId;
         console.log('BlobId:', blobId);
 
@@ -47,7 +47,7 @@ const fetchOutbox: RequestHandler = async (req: Request, res: Response) => {
 
 const fetchMessage: RequestHandler = async (req: Request, res: Response) => {
     const { id } = req.params;
-
+    console.log('Id:', id);
     try {
         const mail = await Mail.findById(id);
         if (!mail) {
@@ -55,11 +55,13 @@ const fetchMessage: RequestHandler = async (req: Request, res: Response) => {
             return;
         }
         const blobId = mail.blobId;
+        console.log('BlobId:', blobId);
         const payload = await getFromWalrus(blobId);
         console.log('Payload:', payload);
-        res.status(200).json(payload.message);
+        const decryptedPayload = decryptData(payload.message);
+        res.status(200).json(decryptedPayload);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch message' });
+        res.status(500).json({ error: `Failed to fetch message ...${error}` });
     }
 }
 

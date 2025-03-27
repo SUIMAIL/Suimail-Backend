@@ -10,10 +10,11 @@ const encryptData = (data: string): string => {
 }
 
 const decryptData = (encryptedData: string): string => {
-    const decryptedData = CryptoJS.AES.decrypt(encryptedData, process.env.KEY || 'defaultKey').toString(CryptoJS.enc.Utf8);
-    const extractedData = decryptedData.split('!+_id_+!')[0];
-    console.log("DecryptedData", decryptedData);
-    console.log("ExtractedDate", extractedData);
+    const truncatedEncryptedData = encryptedData.split('!!!')[0];
+    const decryptedData = CryptoJS.AES.decrypt(truncatedEncryptedData, process.env.KEY || 'defaultKey');
+    console.log("DecryptedData:", decryptedData);
+    const extractedData = decryptedData.toString(CryptoJS.enc.Utf8);
+    console.log("ExtractedData:", extractedData);
     return extractedData;
 }
 
