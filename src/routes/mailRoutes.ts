@@ -35,7 +35,10 @@ const mailRouter = express.Router();
  *       500:
  *         description: Failed to send mail
  */
-mailRouter.post('/sendMail', authMiddleware, sendMail);
+mailRouter.post('/sendMail', 
+    // authMiddleware,
+     sendMail
+    );
 
 /**
  * @swagger
@@ -112,7 +115,11 @@ mailRouter.get('/outbox/:from', authMiddleware, outboxMiddleware, fetchOutbox);
  *       500:
  *         description: Failed to fetch message
  */
-mailRouter.get('/inboxMessage/:to/:id', authMiddleware, inboxMiddleware, fetchMessage);
+mailRouter.get('/inboxMessage/:to/:id', 
+    // authMiddleware, 
+    // inboxMiddleware, 
+    fetchMessage
+);
 
 /**
  * @swagger

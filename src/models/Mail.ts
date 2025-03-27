@@ -11,11 +11,11 @@ interface IMail extends Document {
 
 const MailSchema: Schema = new Schema({
     subject:{type: String, required: true},
-    from: {type: String, required: true, unique: true},
-    to: {type: String, required: true, unique: true},
+    from: {type: String, required: true},
+    to: {type: String, required: true},
     body: {type: String, required: true},
-    blobId: {type: String, required: true},
-    date: {type: Date, default: Date.now}
+    blobId: {type: String, required: true, unique: true},
+    date: {type: Date, default: Date.now, unique: true}
 }) 
 
 export default mongoose.model<IMail>('Mail', MailSchema);

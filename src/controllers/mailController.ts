@@ -6,20 +6,22 @@ import { encryptData, decryptData } from '../utils/encryption';
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
     const { from, to, subject, body } = req.body;
     try {
-        // const newMail = new Mail(req.body);
         const encryptedBody = encryptData(body);
-        const payload = JSON.stringify(body);
+        const payload = JSON.stringify(`${encryptedBody}!+_id_+!${Date.now()}`);
         console.log('Payload:', payload);
-        
-        const walrusBlob = await sendToWalrus(payload);
-        const blobId = walrusBlob.newlyCreated.blobObject.blobId;
 
-        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId });
+        const walrusBlob = await sendToWalrus(encryptedBody);
+        const blobId = walrusBlob.newlyCreated.blobObject.blobId;
+        console.log('BlobId:', blobId);
+
+        //I will still endeavour not to save the encryptedBody in my db, instead get it from the walrus
+        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId});
 
         const savedMail = await newMail.save();
+        console.log('......finalised sending');
         res.status(200).json({ savedMail, blobId });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to sendMail' });
+        res.status(500).json({ error: `Failed to send mail because of the following errors: .... ${error}` });
     }
 }
 
@@ -54,6 +56,7 @@ const fetchMessage: RequestHandler = async (req: Request, res: Response) => {
         }
         const blobId = mail.blobId;
         const payload = await getFromWalrus(blobId);
+        console.log('Payload:', payload);
         res.status(200).json(payload.message);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch message' });

@@ -11,8 +11,10 @@ const encryptData = (data: string): string => {
 
 const decryptData = (encryptedData: string): string => {
     const decryptedData = CryptoJS.AES.decrypt(encryptedData, process.env.KEY || 'defaultKey').toString(CryptoJS.enc.Utf8);
+    const extractedData = decryptedData.split('!+_id_+!')[0];
     console.log("DecryptedData", decryptedData);
-    return decryptedData;
+    console.log("ExtractedDate", extractedData);
+    return extractedData;
 }
 
 export { encryptData, decryptData };
