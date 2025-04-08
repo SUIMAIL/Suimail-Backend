@@ -7,10 +7,11 @@ const outboxMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (!req.params.from) {
         res.status(400).send('Sender is required');
         return;
-    }else if (userAddress !== fromAddress) {
-        res.status(403).json({ error: 'Access denied: Address mismatch' });
-        return;
     }
+    // else if (userAddress !== fromAddress) {
+    //     res.status(403).json({ error: 'Access denied: Address mismatch' });
+    //     return;
+    // }
     
     next();
 };

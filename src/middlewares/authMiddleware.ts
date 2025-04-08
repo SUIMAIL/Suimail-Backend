@@ -14,13 +14,14 @@ declare global {
 }
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header('Authorization') as string;
+    const token = req.header('Authorization')?.replace('Bearer ', '') as string;
 
     if (!token) {
         res.status(401).json({ error: 'No token provided, authorization denied' });
     }
 
     try {
+        console.log(token)
         const decoded = jwt.verify(token, 'jwtsecret');
         req.user = decoded as unknown as { address: string };
         next();

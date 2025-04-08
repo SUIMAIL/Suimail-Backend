@@ -36,9 +36,9 @@ const mailRouter = express.Router();
  *         description: Failed to send mail
  */
 mailRouter.post('/sendMail', 
-    // authMiddleware,
-     sendMail
-    );
+    authMiddleware,
+    sendMail
+);
 
 /**
  * @swagger
@@ -61,7 +61,11 @@ mailRouter.post('/sendMail',
  *       500:
  *         description: Failed to fetch inbox
  */
-mailRouter.get('/inbox/:to',authMiddleware , inboxMiddleware, fetchInbox);
+mailRouter.get('/inbox/:to',
+    authMiddleware , 
+    inboxMiddleware, 
+    fetchInbox
+);
 
 /**
  * @swagger
@@ -84,7 +88,11 @@ mailRouter.get('/inbox/:to',authMiddleware , inboxMiddleware, fetchInbox);
  *       500:
  *         description: Failed to fetch outbox
  */
-mailRouter.get('/outbox/:from', authMiddleware, outboxMiddleware, fetchOutbox);
+mailRouter.get('/outbox/:from', 
+    authMiddleware, 
+    outboxMiddleware, 
+    fetchOutbox
+);
 
 /**
  * @swagger
@@ -116,8 +124,8 @@ mailRouter.get('/outbox/:from', authMiddleware, outboxMiddleware, fetchOutbox);
  *         description: Failed to fetch message
  */
 mailRouter.get('/inboxMessage/:to/:id', 
-    // authMiddleware, 
-    // inboxMiddleware, 
+    authMiddleware, 
+    inboxMiddleware, 
     fetchMessage
 );
 
@@ -150,6 +158,10 @@ mailRouter.get('/inboxMessage/:to/:id',
  *       500:
  *         description: Failed to fetch message
  */
-mailRouter.get('/outboxMessage/:from/:id', authMiddleware, outboxMiddleware, fetchMessage);
+mailRouter.get('/outboxMessage/:from/:id', 
+    authMiddleware, 
+    outboxMiddleware, 
+    fetchMessage
+);
 
 export default mailRouter;
