@@ -1,7 +1,7 @@
 
 const sendToWalrus = async (payload: string) => {
 
-    const uploadToWalrus = await fetch("https://wal-publisher-testnet.staketab.org/v1/blobs", {
+    const uploadToWalrus = await fetch("https://walrus-publisher-testnet.n1stake.com/v1/blobs", {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
