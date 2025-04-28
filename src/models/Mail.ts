@@ -7,6 +7,9 @@ interface IMail extends Document {
     to: string;
     body: string;
     blobId: string;
+    attachmentBlobId?: string;
+    attachmentName?: string;
+    attachmentType?: string;
 }
 
 const MailSchema: Schema = new Schema({
@@ -16,6 +19,9 @@ const MailSchema: Schema = new Schema({
     to: {type: String, required: true},
     body: {type: String, required: true},
     blobId: {type: String, required: true, unique: true},
+    attachmentBlobId: {type: String, required: false},
+    attachmentName: {type: String, required: false},
+    attachmentType: {type: String, required: false},
 }) 
 
 export default mongoose.model<IMail>('Mail', MailSchema);

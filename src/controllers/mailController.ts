@@ -4,18 +4,25 @@ import { sendToWalrus, getFromWalrus } from '../utils/walrus';
 import { encryptData, decryptData } from '../utils/encryption';
 
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
-    const { from, to, subject, body } = req.body;
+    const { from, to, subject, body, attachments } = req.body;
     try {
         const encryptedBody = encryptData(body);
         const payload = `${encryptedBody}!!!${Date.now()}`;
         console.log('Payload:', payload);
+
+        const filePayload = attachments.fileData
+        const fileBlob = await sendToWalrus(filePayload);
+        const fileBlobId = fileBlob.newlyCreated.blobObject.blobId;
+
+        const fileName = attachments.fileName;
+        const fileType = attachments.fileType;
 
         const walrusBlob = await sendToWalrus(payload);
         const blobId = walrusBlob.newlyCreated.blobObject.blobId;
         console.log('BlobId:', blobId);
 
         //I will still endeavour not to save the encryptedBody in my db, instead get it from the walrus
-        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId});
+        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId, attachmentBlobId: fileBlobId, attachmentName: fileName, attachmentType: fileType });
 
         const savedMail = await newMail.save();
         console.log('......finalised sending');
