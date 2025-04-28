@@ -20,6 +20,7 @@ const login: RequestHandler = async (req: Request, res: Response) => {
 
         res.status(200).json({ token, message: 'User login successfull', newbie });
     } catch (error) {
+        console.log('Error during login:', error);
         res.status(500).json({ error: 'Server error (login)' });
     }
 };

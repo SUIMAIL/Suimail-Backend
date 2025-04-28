@@ -18,6 +18,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     if (!token) {
         res.status(401).json({ error: 'No token provided, authorization denied' });
+        return;
     }
 
     try {
