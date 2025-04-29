@@ -7,6 +7,8 @@ const sendMail: RequestHandler = async (req: Request, res: Response) => {
     const { from, to, subject, body } = req.body;
     const files = req.files as Express.Multer.File[]; // Uploaded files
 
+    console.log('Body(backend):', body);
+
     try {
         const encryptedBody = encryptData(body);
         const payload = `${encryptedBody}!!!${Date.now()}`;
@@ -20,7 +22,7 @@ const sendMail: RequestHandler = async (req: Request, res: Response) => {
         // Process and upload attachments to Walrus
         const attachments = [];
         for (const file of files) {
-            const attachmentPayload = file.buffer.toString('base64'); // Convert file to base64
+            const attachmentPayload = file.buffer;
             const attachmentBlob = await sendToWalrus(attachmentPayload);
             attachments.push({
                 blobId: attachmentBlob.newlyCreated.blobObject.blobId,
@@ -66,20 +68,39 @@ const fetchMessage: RequestHandler = async (req: Request, res: Response) => {
     console.log('Id:', id);
     try {
         const mail = await Mail.findById(id);
+
         if (!mail) {
             res.status(404).json({ error: 'Mail not found' });
             return;
         }
+
         const blobId = mail.blobId;
         console.log('BlobId:', blobId);
         const payload = await getFromWalrus(blobId);
         console.log('Payload:', payload);
         const decryptedPayload = decryptData(payload.message);
-        res.status(200).json(decryptedPayload);
+
+        if (!mail.attachments) {
+            res.status(200).json({ mail: decryptedPayload, attachments: [] });
+            return;
+        }
+        
+        // Fetch attachments from Walrus
+        const attachments = [];
+        for (const attachment of mail.attachments ?? []) {
+            const attachmentPayload = await getFromWalrus(attachment.blobId);
+            attachments.push({
+                fileName: attachment.fileName,
+                fileType: attachment.fileType,
+                content: attachmentPayload.message,
+            });
+        }
+
+        res.status(200).json({ mail: decryptedPayload, attachments });
     } catch (error) {
         res.status(500).json({ error: `Failed to fetch message ...${error}` });
     }
-}
+};
 
 
 

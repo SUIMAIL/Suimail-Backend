@@ -1,5 +1,5 @@
 
-const sendToWalrus = async (payload: string) => {
+const sendToWalrus = async (payload: any) => {
 
     const uploadToWalrus = await fetch("https://walrus-publisher-testnet.n1stake.com/v1/blobs", {
         method: 'PUT',
