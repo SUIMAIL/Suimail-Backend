@@ -3,6 +3,7 @@ import { sendMail, fetchInbox, fetchOutbox, fetchMessage } from '../controllers/
 import inboxMiddleware from '../middlewares/inboxMiddleware';
 import outboxMiddleware from '../middlewares/outboxMiddleware';
 import authMiddleware from '../middlewares/authMiddleware';
+import upload from '../middlewares/attachmentMiddleware';
 
 const mailRouter = express.Router();
 
@@ -37,6 +38,7 @@ const mailRouter = express.Router();
  */
 mailRouter.post('/sendMail', 
     authMiddleware,
+    upload.array('attachments'), // Middleware to handle file uploads
     sendMail
 );
 

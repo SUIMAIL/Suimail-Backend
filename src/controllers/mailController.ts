@@ -4,33 +4,42 @@ import { sendToWalrus, getFromWalrus } from '../utils/walrus';
 import { encryptData, decryptData } from '../utils/encryption';
 
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
-    const { from, to, subject, body, attachments } = req.body;
+    const { from, to, subject, body } = req.body;
+    const files = req.files as Express.Multer.File[]; // Uploaded files
+
     try {
         const encryptedBody = encryptData(body);
         const payload = `${encryptedBody}!!!${Date.now()}`;
         console.log('Payload:', payload);
 
-        const filePayload = attachments.fileData
-        const fileBlob = await sendToWalrus(filePayload);
-        const fileBlobId = fileBlob.newlyCreated.blobObject.blobId;
-
-        const fileName = attachments.fileName;
-        const fileType = attachments.fileType;
-
+        // Upload email body to Walrus
         const walrusBlob = await sendToWalrus(payload);
         const blobId = walrusBlob.newlyCreated.blobObject.blobId;
         console.log('BlobId:', blobId);
 
-        //I will still endeavour not to save the encryptedBody in my db, instead get it from the walrus
-        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId: blobId, attachmentBlobId: fileBlobId, attachmentName: fileName, attachmentType: fileType });
+        // Process and upload attachments to Walrus
+        const attachments = [];
+        for (const file of files) {
+            const attachmentPayload = file.buffer.toString('base64'); // Convert file to base64
+            const attachmentBlob = await sendToWalrus(attachmentPayload);
+            attachments.push({
+                blobId: attachmentBlob.newlyCreated.blobObject.blobId,
+                fileName: file.originalname,
+                fileType: file.mimetype,
+            });
+        }
+        console.log('Attachments:', attachments);
 
+        // Save email with attachments in the database
+        const newMail = new Mail({ from, to, subject, body: encryptedBody, blobId, attachments });
         const savedMail = await newMail.save();
+
         console.log('......finalised sending');
         res.status(200).json({ savedMail, blobId });
     } catch (error) {
         res.status(500).json({ error: `Failed to send mail because of the following errors: .... ${error}` });
     }
-}
+};
 
 const fetchInbox: RequestHandler = async (req: Request, res: Response) => {
     const { to: address } = req.params;

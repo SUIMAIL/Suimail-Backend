@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "target": "ES2020", // Use a modern JavaScript version
+      "module": "CommonJS", // Node.js uses CommonJS
+      "strict": true, // Enable all strict type-checking options
+      "esModuleInterop": true, // Allow default imports from CommonJS modules
+      "skipLibCheck": true, // Skip type checking of declaration files
+      "forceConsistentCasingInFileNames": true, // Enforce consistent casing
+      "outDir": "./dist", // Output directory for compiled files
+      "baseUrl": "./", // Base directory for module resolution
+      "paths": {
+        "*": ["node_modules/*"]
+      }
+    },
+    "include": [
+      "src/**/*.ts", // Include all TypeScript files in the src directory
+      "src/types/express.d.ts" // Explicitly include the express.d.ts file
+    ],
+    "exclude": [
+      "node_modules", // Exclude node_modules
+      "dist" // Exclude the output directory
+    ]
+  }
