@@ -25,22 +25,5 @@ const login: RequestHandler = async (req: Request, res: Response) => {
     }
 };
 
-const registerNS: RequestHandler = async (req: Request, res: Response) => {
-    const { address, suiNs } = req.body;
 
-    try {
-        const user = await User.findOne({ address });
-
-        if (user) {
-            user.suiNs = suiNs;
-            await user.save();
-            res.status(200).json({ message: 'User updated successfully' });
-        } else {
-            res.status(404).json({ error: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-}
-
-export { login, registerNS };
+export { login};

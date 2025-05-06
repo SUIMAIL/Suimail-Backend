@@ -1,13 +1,36 @@
 import { Request, RequestHandler, Response } from 'express';
 import Mail from '../models/Mail';
+import User from '../models/User';
 import { sendToWalrus, getFromWalrus } from '../utils/walrus';
 import { encryptData, decryptData } from '../utils/encryption';
+
+function endsWith(str: string, searchString: string): boolean {
+    if (str.length < searchString.length) {
+        return false;
+    }
+    return str.substring(str.length - searchString.length) === searchString;
+}
+
+// // Example usage:
+// console.log(endsWith("example@suimail", "@suimail")); // true
+// console.log(endsWith("example@gmail.com", "@suimail")); // false
 
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
     const { from, to, subject, body } = req.body;
     const files = req.files as Express.Multer.File[]; // Uploaded files
 
     console.log('Body(backend):', body);
+    if (to.endsWith('@suimail')) {
+        // const suimailNs = to.split('@')[0];
+        const recipientUser = await User.findOne({ suimailNs: to });
+
+        if (!recipientUser) {
+            res.status(404).json({ error: 'Recipient not found' });
+            return;
+        }
+
+        req.body.to = recipientUser.address;
+    }
 
     try {
         const encryptedBody = encryptData(body);

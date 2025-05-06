@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import connectDB from './config/db';
 import authRouter from "./routes/authRoutes";
 import mailRouter from "./routes/mailRoutes";
+import settingsRouter from "./routes/settingsRoutes";
 import { setupSwaggerDocs } from "./config/swagger";
 import cors from 'cors';
 
@@ -29,6 +30,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use('/user', authRouter);
 app.use('/mail', mailRouter);
+app.use('/settings', settingsRouter);
 
 app.listen(port, () => {
     console.log(`The server is running at http://localhost:${port}`);

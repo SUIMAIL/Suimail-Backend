@@ -12,7 +12,14 @@ interface IMail extends Document {
         fileName: string;
         fileType: string;
     }[];
+    // mailFee: number;
+    // suiNs?: `${string}@suimail`;
 }
+
+// const generateRandomSuiNs = (): string => {
+//     const randomString = Math.random().toString(36).substring(2, 7); // Generate a random 5-letter string
+//     return `${randomString}@suimail`;
+// };
 
 const MailSchema: Schema = new Schema({
     date: { type: Date, default: Date.now, unique: true },
@@ -28,6 +35,8 @@ const MailSchema: Schema = new Schema({
             fileType: { type: String, required: true },
         },
     ],
+    // mailFee: { type: Number, required: false, default: 0 },
+    // suiNs: { type: String, required: false, default: generateRandomSuiNs },
 });
 
 export default mongoose.model<IMail>('Mail', MailSchema);
