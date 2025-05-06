@@ -3,7 +3,13 @@ import User from '../models/User';
 
 const getMailFeeController: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const { address } = req.params; // Assuming you want to use the address from the request params
-    const user = await User.findOne({ address });
+    let user;
+    if (address.endsWith('@suimail')){
+        user = await User.findOne({ suimailNs: address });
+    }else{
+        user = await User.findOne({ address });
+    }
+
     if (user && user.mailFee) {
         res.status(200).json({ mailFee: user.mailFee });
     } else {

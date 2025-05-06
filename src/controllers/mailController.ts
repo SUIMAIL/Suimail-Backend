@@ -4,16 +4,6 @@ import User from '../models/User';
 import { sendToWalrus, getFromWalrus } from '../utils/walrus';
 import { encryptData, decryptData } from '../utils/encryption';
 
-function endsWith(str: string, searchString: string): boolean {
-    if (str.length < searchString.length) {
-        return false;
-    }
-    return str.substring(str.length - searchString.length) === searchString;
-}
-
-// // Example usage:
-// console.log(endsWith("example@suimail", "@suimail")); // true
-// console.log(endsWith("example@gmail.com", "@suimail")); // false
 
 const sendMail: RequestHandler = async (req: Request, res: Response) => {
     const { from, to, subject, body } = req.body;
