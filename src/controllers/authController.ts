@@ -3,14 +3,14 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
 const login: RequestHandler = async (req: Request, res: Response) => {
-    const { address, suiNs } = req.body;
+    const { address } = req.params;
     let newbie = false;
     try {
         const user = await User.findOne({ address });
 
         if(!user){
             newbie = true;
-            const newUser = new User({ address, suiNs });
+            const newUser = new User({ address });
             await newUser.save();
         }
 

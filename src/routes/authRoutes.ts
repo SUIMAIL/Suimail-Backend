@@ -27,7 +27,7 @@ const authRouter = express.Router();
  *       500:
  *         description: Server error
  */
-authRouter.post('/login', login);
+authRouter.get('/login/:address', login);
 
 
 export default authRouter;

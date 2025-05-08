@@ -18,7 +18,7 @@ settingsRouter.get('/suimailNs/:address',
     getSuimailNsController
 )
 
-settingsRouter.post('/suimailNs/update',
+settingsRouter.post('/suimailNs/:address',
     authMiddleware,
     suimailNsController
 )
