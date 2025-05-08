@@ -3,14 +3,10 @@ import User from '../models/User';
 
 const getMailFeeController: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const { address } = req.params; // Assuming you want to use the address from the request params
-    let user;
-    if (address.endsWith('@suimail')){
-        user = await User.findOne({ suimailNs: address });
-    }else{
-        user = await User.findOne({ address });
-    }
-
-    if (user && user.mailFee) {
+    const user = await User.findOne({ address });
+    console.log(address)
+    
+    if (user) {
         res.status(200).json({ mailFee: user.mailFee });
     } else {
         res.status(404).json({ error: 'User not found' });
@@ -41,7 +37,7 @@ const mailFeeController: RequestHandler = async (req: Request, res: Response): P
 const getSuimailNsController: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     const { address } = req.params; // Assuming you want to use the address from the request params
     const user = await User.findOne({ address });
-    if (user && user.suimailNs) {
+    if (user) {
         res.status(200).json({ suimailNs: user.suimailNs });
     } else {
         res.status(404).json({ error: 'User not found' });
