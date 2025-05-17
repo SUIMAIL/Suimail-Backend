@@ -1,8 +1,8 @@
-import express from 'express';
-import { login } from '../controllers/authController';
-import authMiddleware from '../middlewares/authMiddleware';
+import express from "express"
+import { AuthController } from "../api/auth/auth.controller"
 
-const authRouter = express.Router();
+const authRouter = express.Router()
+const authController = new AuthController()
 
 /**
  * @swagger
@@ -27,7 +27,6 @@ const authRouter = express.Router();
  *       500:
  *         description: Server error
  */
-authRouter.get('/login/:address', login);
+authRouter.get("/login/:address", authController.login.bind(authController))
 
-
-export default authRouter;
+export default authRouter

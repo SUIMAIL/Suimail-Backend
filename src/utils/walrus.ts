@@ -1,38 +1,47 @@
+import axios from "axios"
+import { InternalServerError } from "./AppError"
 
-const sendToWalrus = async (payload: any) => {
-
-    const uploadToWalrus = await fetch("https://walrus-publisher-testnet.n1stake.com/v1/blobs", {
-        method: 'PUT',
+const sendToWalrus = async (
+  payload: string | Buffer | Buffer<ArrayBufferLike>
+) => {
+  try {
+    const uploadToWalrus = await axios.put(
+      "https://walrus-publisher-testnet.n1stake.com/v1/blobs",
+      {
+        message: payload,
+      },
+      {
         headers: {
-            'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            "message": payload,
-        })
+      }
+    )
+
+    return uploadToWalrus.data
+  } catch (error) {
+    throw new InternalServerError("Failed to send to Walrus", {
+      error,
     })
-    
-    const walrusBlob = await uploadToWalrus.json();
-    console.log(walrusBlob);
-    return walrusBlob;
+  }
 }
 
 const getFromWalrus = async (blobId: string) => {
-    console.log('.....fetching from walrus');
-    try{
-        const fetchFromWalrus = await fetch(`https://wal-aggregator-testnet.staketab.org/v1/blobs/${blobId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        
-        const payload = await fetchFromWalrus.json()
-        console.log('Payload from getWalrus:', payload);
-        console.log(payload.message);
-        return payload;
-    }catch(error){
-        console.log('Get from Walrus Error:', error)
-    }
+  try {
+    const fetchFromWalrus = await axios.get(
+      `https://wal-aggregator-testnet.staketab.org/v1/blobs/${blobId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+
+    return fetchFromWalrus.data
+  } catch (error) {
+    throw new InternalServerError("Failed to get from Walrus", {
+      error,
+    })
+  }
 }
 
-export {sendToWalrus, getFromWalrus};
+export { sendToWalrus, getFromWalrus }
