@@ -8,8 +8,6 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.log("ErrorHandler")
-
   if (!(err instanceof AppError)) {
     err = new AppError(500, err.message || "Something went wrong")
   }
