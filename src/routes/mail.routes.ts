@@ -36,7 +36,7 @@ const mailController = new MailController()
 mailRouter.post(
   "/send",
   upload.array("attachments"), // Middleware to handle file uploads
-  mailController.sendMail.bind(mailController)
+  mailController.sendMail
 )
 
 /**
@@ -60,7 +60,7 @@ mailRouter.post(
  *       500:
  *         description: Failed to fetch inbox
  */
-mailRouter.get("/inbox/me", mailController.fetchInbox.bind(mailController))
+mailRouter.get("/inbox/me", mailController.fetchInbox)
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ mailRouter.get("/inbox/me", mailController.fetchInbox.bind(mailController))
  *       500:
  *         description: Failed to fetch outbox
  */
-mailRouter.get("/outbox/me", mailController.fetchOutBox.bind(mailController))
+mailRouter.get("/outbox/me", mailController.fetchOutBox)
 
 /**
  * @swagger
@@ -106,6 +106,6 @@ mailRouter.get("/outbox/me", mailController.fetchOutBox.bind(mailController))
  *       500:
  *         description: Failed to fetch mail
  */
-mailRouter.get("/:id", mailController.fetchMail.bind(mailController))
+mailRouter.get("/:id", mailController.fetchMail)
 
 export default mailRouter

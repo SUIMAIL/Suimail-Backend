@@ -27,6 +27,6 @@ const authController = new AuthController()
  *       500:
  *         description: Server error
  */
-authRouter.get("/login/:address", authController.login.bind(authController))
+authRouter.get("/login/:address", authController.login)
 
 export default authRouter

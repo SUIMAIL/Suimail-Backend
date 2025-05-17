@@ -22,7 +22,7 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc({
   ...swaggerOptions,
-  apis: ["./src/routes/authRoutes.ts", "./src/routes/mailRoutes.ts"],
+  apis: ["./src/routes/auth.routes.ts", "./src/routes/mail.routes.ts", "./src/routes/user.routes.ts"],
 })
 
 export const setupSwaggerDocs = (app: Express) => {
