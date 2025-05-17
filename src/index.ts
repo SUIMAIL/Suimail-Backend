@@ -1,37 +1,21 @@
-import express, { Request, Response } from "express";
-import connectDB from './config/db';
-import authRouter from "./routes/authRoutes";
-import mailRouter from "./routes/mailRoutes";
-import settingsRouter from "./routes/settingsRoutes";
-import { setupSwaggerDocs } from "./config/swagger";
-import cors from 'cors';
+import express, { Request, Response } from "express"
+import http from "http"
+import connectDB from "./config/db"
+import { middlewareSetup } from "./setup"
+import { routeSetup } from "./routes/routes"
+import { errorHandler } from "./middlewares/errorHandler"
 
-connectDB();
+const app = express()
+const port = process.env.PORT || 3000
 
-const app = express();
+connectDB()
+middlewareSetup(app)
+routeSetup(app)
 
-const port = process.env.PORT || 3000;
+// Register error handler after routes
+app.use(errorHandler)
 
-app.use(cors(
-    {
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-    }
-));
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-
-setupSwaggerDocs(app); // Add Swagger setup
-
-app.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Welcome to the Express + TypeScript Server!" });
-});
-
-app.use('/user', authRouter);
-app.use('/mail', mailRouter);
-app.use('/settings', settingsRouter);
-
-app.listen(port, () => {
-    console.log(`The server is running at http://localhost:${port}`);
-});
+const server = http.createServer(app)
+server.listen(port, () => {
+  console.log(`The server is running at http://localhost:${port}`)
+})
