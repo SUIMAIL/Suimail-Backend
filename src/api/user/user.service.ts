@@ -78,4 +78,50 @@ export class UserService {
     await user.save()
     return fee
   }
+
+  async updateUserWhitelist(
+    address: string,
+    whitelistAddresses: string[]
+  ): Promise<IUser> {
+    const user = await this.findByAddress(address)
+
+    if (!user) throw new NotFoundError("User not found")
+
+    if (whitelistAddresses.some((address) => address === user.address))
+      throw new BadRequestError("Cannot whitelist self")
+
+    const filteredWhitelist = whitelistAddresses.filter(
+      (address) => !user.whitelist.includes(address)
+    )
+
+    if (filteredWhitelist.length > 0) {
+      user.whitelist = [...user.whitelist, ...filteredWhitelist]
+      await user.save()
+    }
+
+    return user
+  }
+
+  async updateUserBlacklist(
+    address: string,
+    blacklistAddresses: string[]
+  ): Promise<IUser> {
+    const user = await this.findByAddress(address)
+
+    if (!user) throw new NotFoundError("User not found")
+
+    if (blacklistAddresses.some((address) => address === user.address))
+      throw new BadRequestError("Cannot blacklist self")
+
+    const filteredBlacklist = blacklistAddresses.filter(
+      (address) => !user.blacklist.includes(address)
+    )
+
+    if (filteredBlacklist.length > 0) {
+      user.blacklist = [...user.blacklist, ...filteredBlacklist]
+      await user.save()
+    }
+
+    return user
+  }
 }

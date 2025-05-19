@@ -3,7 +3,7 @@ import { getFromWalrus, sendToWalrus } from "../../utils/walrus"
 import { UserService } from "../user/user.service"
 import { decryptData, encryptData } from "../../utils/encryption"
 import { InternalServerError, NotFoundError } from "../../utils/AppError"
-import { MailResponseDto } from "./dtos/mail-response.dto"
+import { MailResponseDto } from "./schemas/mail-response.dto"
 
 export class MailService {
   private userService: UserService
@@ -34,13 +34,19 @@ export class MailService {
     })
   }
 
-  async sendMail(
-    senderAddress: string,
-    recipientAddress: string,
-    subject: string,
-    body: string,
+  async sendMail({
+    senderAddress,
+    recipientAddress,
+    subject,
+    body,
+    files,
+  }: {
+    senderAddress: string
+    recipientAddress: string
+    subject: string
+    body: string
     files: Express.Multer.File[]
-  ): Promise<void> {
+  }): Promise<void> {
     if (recipientAddress.endsWith("@suimail")) {
       const recipientUser = await this.userService.findBySuimailNs(
         recipientAddress
@@ -102,6 +108,13 @@ export class MailService {
         error,
       })
     }
+  }
+
+  async markAsRead(mailId: string, address: string): Promise<void> {
+    const mail = await Mail.findOne({ _id: mailId, recipientAddress: address })
+    if (!mail) throw new NotFoundError("Mail not found", { id: mailId })
+    mail.readAt = new Date()
+    await mail.save()
   }
 
   async fetchInboxByUserAddress(address: string) {
@@ -169,5 +182,33 @@ export class MailService {
         error,
       })
     }
+  }
+
+  async getAddressListFeatures(
+    recipientAddress: string,
+    senderAddress: string
+  ) {
+    const recipientUser = await this.userService.findByAddress(recipientAddress)
+    if (!recipientUser)
+      throw new NotFoundError("User not found", { address: recipientAddress })
+
+    if (!(await this.userService.findByAddress(senderAddress)))
+      throw new NotFoundError("User not found", { address: senderAddress })
+
+    const recipientUserWhitelist = recipientUser.whitelist
+    const recipientUserBlacklist = recipientUser.blacklist
+
+    let senderIsWhitelisted = false
+    let senderIsBlacklisted = false
+
+    if (recipientUserWhitelist.some((address) => address === senderAddress)) {
+      senderIsWhitelisted = true
+    }
+
+    if (recipientUserBlacklist.some((address) => address === senderAddress)) {
+      senderIsBlacklisted = true
+    }
+
+    return { senderIsWhitelisted, senderIsBlacklisted }
   }
 }

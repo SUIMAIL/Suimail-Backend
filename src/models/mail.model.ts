@@ -11,22 +11,62 @@ export interface IMail extends Document {
     fileName: string
     fileType: string
   }[]
+
+  readAt?: Date
 }
 
 const MailSchema: Schema = new Schema(
   {
-    blobId: { type: String, required: true, unique: true },
-    subject: { type: String, required: true },
-    senderAddress: { type: String, required: true },
-    recipientAddress: { type: String, required: true },
-    body: { type: String, required: true },
+    blobId: {
+      type: String,
+      required: true,
+      unique: true,
+      description: "Unique identifier for the mail content blob",
+    },
+    subject: {
+      type: String,
+      required: true,
+      description: "Subject line of the mail",
+    },
+    senderAddress: {
+      type: String,
+      required: true,
+      description: "Wallet address of the mail sender",
+    },
+    recipientAddress: {
+      type: String,
+      required: true,
+      description: "Wallet address of the mail recipient",
+    },
+    body: {
+      type: String,
+      required: true,
+      description: "Main content/body of the mail",
+    },
     attachments: [
       {
-        blobId: { type: String, required: true },
-        fileName: { type: String, required: true },
-        fileType: { type: String, required: true },
+        blobId: {
+          type: String,
+          required: true,
+          description: "Unique identifier for the attachment blob",
+        },
+        fileName: {
+          type: String,
+          required: true,
+          description: "Original name of the attached file",
+        },
+        fileType: {
+          type: String,
+          required: true,
+          description: "MIME type of the attached file",
+        },
       },
     ],
+    readAt: {
+      type: Date,
+      required: false,
+      description: "Date and time the mail was read",
+    },
   },
   {
     timestamps: true,

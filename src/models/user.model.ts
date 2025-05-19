@@ -1,21 +1,57 @@
 import mongoose, { Schema, Document } from "mongoose"
-import { generateRandomSuiNs } from "../utils/helpers"
 
 export interface IUser extends Document {
+  firstName?: string
+  lastName?: string
   address: string
   suimailNs: string
   mailFee?: number
+  whitelist: string[]
+  blacklist: string[]
 }
 
 const UserSchema: Schema = new Schema(
   {
-    address: { type: String, required: true, unique: true },
+    firstName: {
+      type: String,
+      required: false,
+      description: "First name of the user",
+    },
+    lastName: {
+      type: String,
+      required: false,
+      description: "Last name of the user",
+    },
+    address: {
+      type: String,
+      required: true,
+      unique: true,
+      description: "Wallet address of the user",
+    },
     suimailNs: {
       type: String,
       required: true,
       unique: true,
+      description: "Suimail namespace of the user",
     },
-    mailFee: { type: Number, required: false, default: 0 },
+    mailFee: {
+      type: Number,
+      required: false,
+      default: 0,
+      description: "Mail fee of the user in SUI",
+    },
+    whitelist: {
+      type: [String],
+      default: [],
+      description:
+        "List of addresses that are whitelisted to send mail to this user",
+    },
+    blacklist: {
+      type: [String],
+      default: [],
+      description:
+        "List of addresses that are blacklisted from sending mail to this user",
+    },
   },
   {
     timestamps: true,

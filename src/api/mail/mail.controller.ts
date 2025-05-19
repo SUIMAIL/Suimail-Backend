@@ -1,6 +1,9 @@
 import { Request, Response, RequestHandler } from "express"
+import {
+  MailResponseDto,
+  MailListResponseDto,
+} from "./schemas/mail-response.dto"
 import { MailService } from "./mail.service"
-import { MailListResponseDto, MailResponseDto } from "./dtos/mail-response.dto"
 
 export class MailController {
   private mailService: MailService
@@ -13,11 +16,17 @@ export class MailController {
     req: Request,
     res: Response
   ): Promise<void> => {
-    const { to, subject, body } = req.body
+    const { recipientAddress, subject, body } = req.body
     const files = req.files as Express.Multer.File[]
     const from = req.user!.address
 
-    await this.mailService.sendMail(from, to, subject, body, files)
+    await this.mailService.sendMail({
+      recipientAddress,
+      senderAddress: from,
+      subject,
+      body,
+      files,
+    })
     res.status(200).json({ message: "Mail sent successfully" })
   }
 
@@ -37,5 +46,18 @@ export class MailController {
     const { id } = req.params
     const mail = await this.mailService.fetchMailById(id)
     res.status(200).json(MailResponseDto.fromEntity(mail))
+  }
+
+  getAddressListFeatures: RequestHandler = async (
+    req: Request,
+    res: Response
+  ) => {
+    const senderAddress = req.user!.address
+    const recipientAddress = req.params.address
+    const addressListFeatures = await this.mailService.getAddressListFeatures(
+      recipientAddress,
+      senderAddress
+    )
+    res.status(200).json(addressListFeatures)
   }
 }

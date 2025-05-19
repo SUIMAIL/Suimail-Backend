@@ -1,5 +1,7 @@
 import express from "express"
 import { AuthController } from "../api/auth/auth.controller"
+import { validateRequest } from "../middlewares/validation/validation.middleware"
+import { getLoginSchema } from "../api/auth/schemas/auth.schema"
 
 const authRouter = express.Router()
 const authController = new AuthController()
@@ -27,6 +29,10 @@ const authController = new AuthController()
  *       500:
  *         description: Server error
  */
-authRouter.get("/login/:address", authController.login)
+authRouter.get(
+  "/login/:address",
+  validateRequest(getLoginSchema, "params"),
+  authController.login
+)
 
 export default authRouter

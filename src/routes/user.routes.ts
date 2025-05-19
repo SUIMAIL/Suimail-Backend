@@ -1,5 +1,11 @@
 import express from "express"
 import { UserController } from "../api/user/user.controller"
+import { validateRequest } from "../middlewares/validation/validation.middleware"
+import {
+  updateUserFilterListSchema,
+  updateUserMailFeeSchema,
+  updateUserSuimailNsSchema,
+} from "../api/user/schemas/update-user.schema"
 
 const userRouter = express.Router()
 const userController = new UserController()
@@ -48,7 +54,11 @@ userRouter.get("/suimailNs", userController.getUserSuimailNs)
  *       500:
  *         description: Server error
  */
-userRouter.post("/suimailNs", userController.updateUserSuimailNs)
+userRouter.post(
+  "/suimailNs",
+  validateRequest(updateUserSuimailNsSchema, "body"),
+  userController.updateUserSuimailNs
+)
 
 /**
  * @swagger
@@ -94,6 +104,78 @@ userRouter.get("/mailFee", userController.getUserMailFee)
  *       500:
  *         description: Server error
  */
-userRouter.post("/mailFee", userController.updateUserMailFee)
+userRouter.post(
+  "/mailFee",
+  validateRequest(updateUserMailFeeSchema, "body"),
+  userController.updateUserMailFee
+)
+
+/**
+ * @swagger
+ * /user/whitelist:
+ *   post:
+ *     summary: Update user's whitelist
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               addresses:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   description: A valid SUI address
+ *     responses:
+ *       200:
+ *         description: Successfully updated user's whitelist
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+userRouter.post(
+  "/whitelist",
+  validateRequest(updateUserFilterListSchema, "body"),
+  userController.updateUserWhitelist
+)
+
+/**
+ * @swagger
+ * /user/blacklist:
+ *   post:
+ *     summary: Update user's blacklist
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               addresses:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   description: A valid SUI address
+ *     responses:
+ *       200:
+ *         description: Successfully updated user's blacklist
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+userRouter.post(
+  "/blacklist",
+  validateRequest(updateUserFilterListSchema, "body"),
+  userController.updateUserBlacklist
+)
 
 export default userRouter
