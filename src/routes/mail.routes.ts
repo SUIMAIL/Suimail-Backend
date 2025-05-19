@@ -1,6 +1,9 @@
 import express from "express"
 import upload from "../middlewares/attachment.middleware"
 import { MailController } from "../api/mail/mail.controller"
+import { sendMailSchema } from "../api/mail/schemas/send-mail.schema"
+import { validateRequest } from "../middlewares/validation/validation.middleware"
+import { getAddressListFeaturesSchema } from "../api/mail/schemas/get-address-list-features.schema"
 
 const mailRouter = express.Router()
 const mailController = new MailController()
@@ -35,7 +38,8 @@ const mailController = new MailController()
  */
 mailRouter.post(
   "/send",
-  upload.array("attachments"), // Middleware to handle file uploads
+  upload.array("attachments"),
+  validateRequest(sendMailSchema, "body"),
   mailController.sendMail
 )
 
@@ -107,5 +111,11 @@ mailRouter.get("/outbox/me", mailController.fetchOutBox)
  *         description: Failed to fetch mail
  */
 mailRouter.get("/:id", mailController.fetchMail)
+
+mailRouter.get(
+  "/get-address-list-features/:address",
+  validateRequest(getAddressListFeaturesSchema, "params"),
+  mailController.getAddressListFeatures
+)
 
 export default mailRouter
