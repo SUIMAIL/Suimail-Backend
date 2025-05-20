@@ -12,7 +12,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: `http://localhost:${process.env.PORT}`,
         description: "Development server",
       },
     ],
@@ -22,10 +22,16 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc({
   ...swaggerOptions,
-  apis: ["./src/routes/auth.routes.ts", "./src/routes/mail.routes.ts", "./src/routes/user.routes.ts"],
+  apis: [
+    "./src/routes/auth.routes.ts",
+    "./src/routes/mail.routes.ts",
+    "./src/routes/user.routes.ts",
+  ],
 })
 
 export const setupSwaggerDocs = (app: Express) => {
   app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs))
-  console.log("Swagger docs available at http://localhost:3000/docs")
+  console.log(
+    `Swagger docs available at http://localhost:${process.env.PORT}/docs`
+  )
 }

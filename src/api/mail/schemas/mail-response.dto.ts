@@ -1,9 +1,6 @@
 import { IMail } from "../../../models/mail.model"
 
-type MailResponse = Pick<
-  IMail,
-  "blobId" | "senderAddress" | "recipientAddress" | "subject" | "body"
->
+type MailResponse = Pick<IMail, "blobId" | "subject" | "body">
 
 export class MailResponseDto {
   constructor(
@@ -15,16 +12,12 @@ export class MailResponseDto {
     }[]
   ) {
     this.blobId = mail.blobId
-    this.senderAddress = mail.senderAddress
-    this.recipientAddress = mail.recipientAddress
     this.subject = mail.subject
     this.body = mail.body
     this.attachments = attachments
   }
 
   blobId: string
-  senderAddress: string
-  recipientAddress: string
   subject: string
   body: string
   attachments?: {

@@ -8,6 +8,7 @@ export interface IUser extends Document {
   mailFee?: number
   whitelist: string[]
   blacklist: string[]
+  authTokenVersion: number
 }
 
 const UserSchema: Schema = new Schema(
@@ -51,6 +52,11 @@ const UserSchema: Schema = new Schema(
       default: [],
       description:
         "List of addresses that are blacklisted from sending mail to this user",
+    },
+    authTokenVersion: {
+      type: Number,
+      default: 0,
+      description: "Version of the auth token",
     },
   },
   {

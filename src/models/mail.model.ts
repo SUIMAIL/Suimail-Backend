@@ -3,8 +3,8 @@ import mongoose, { Schema, Document } from "mongoose"
 export interface IMail extends Document {
   blobId: string
   subject: string
-  senderAddress: string
-  recipientAddress: string
+  senderId: string
+  recipientId: string
   body: string
   attachments?: {
     blobId: string
@@ -28,15 +28,17 @@ const MailSchema: Schema = new Schema(
       required: true,
       description: "Subject line of the mail",
     },
-    senderAddress: {
-      type: String,
+    senderId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      description: "Wallet address of the mail sender",
+      description: "ID of the mail sender",
     },
-    recipientAddress: {
-      type: String,
+    recipientId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      description: "Wallet address of the mail recipient",
+      description: "ID of the mail recipient",
     },
     body: {
       type: String,

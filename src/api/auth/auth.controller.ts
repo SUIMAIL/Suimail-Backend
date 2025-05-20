@@ -1,4 +1,4 @@
-import { Request, Response, RequestHandler } from "express"
+import { Request, Response, RequestHandler, NextFunction } from "express"
 import { AuthService } from "./auth.service"
 
 export class AuthController {
@@ -10,10 +10,15 @@ export class AuthController {
 
   login: RequestHandler = async (
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
   ): Promise<void> => {
-    const { address } = req.params
-    const token = await this.authService.login(address)
-    res.status(200).json({ access_token: token })
+    try {
+      const { address } = req.params
+      const token = await this.authService.login(address)
+      res.status(200).json({ access_token: token })
+    } catch (error) {
+      next(error)
+    }
   }
 }

@@ -2,10 +2,10 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-export const { PORT, MONGO_URI, CORS_ORIGIN, JWT_SECRET, MAIL_FEE } =
+export const { PORT, MONGO_URI, CORS_ORIGIN, JWT_SECRET, JWT_EXPIRES } =
   process.env
 
-const requiredEnvs = [PORT, MONGO_URI, CORS_ORIGIN, JWT_SECRET, MAIL_FEE]
+const requiredEnvs = [PORT, MONGO_URI, CORS_ORIGIN, JWT_SECRET, JWT_EXPIRES]
 
 if (requiredEnvs.some((env) => !env)) {
   throw new Error(

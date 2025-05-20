@@ -6,3 +6,5 @@ node_modules/
 logs
 
 dist/
+
+.DS_Store

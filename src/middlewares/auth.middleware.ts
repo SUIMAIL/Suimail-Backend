@@ -1,27 +1,17 @@
 import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "../config/envs"
+import { JWTPayload } from "../types/global"
 import { UnauthorizedError } from "../utils/AppError"
+import { UserService } from "../api/user/user.service"
 
-interface JWTPayload {
-  address: string
-  iat?: number
-  exp?: number
-}
+const userService = new UserService()
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JWTPayload
-    }
-  }
-}
-
-const authMiddleware = (
+const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   const authHeader = req.header("Authorization")
 
   if (!authHeader) {
@@ -30,7 +20,11 @@ const authMiddleware = (
   }
 
   if (!authHeader.startsWith("Bearer ")) {
-    next(new UnauthorizedError("Invalid authorization format. Use 'Bearer <token>'"))
+    next(
+      new UnauthorizedError(
+        "Invalid authorization format. Use 'Bearer <token>'"
+      )
+    )
     return
   }
 
@@ -44,12 +38,24 @@ const authMiddleware = (
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload
 
-    if (!decoded.address) {
+    if (!decoded.sub) {
       next(new UnauthorizedError("Invalid token payload"))
       return
     }
 
-    req.user = decoded
+    const user = await userService.findById(decoded.sub)
+
+    if (!user) {
+      next(new UnauthorizedError("User not found"))
+      return
+    }
+
+    if (decoded.version !== user.authTokenVersion) {
+      next(new UnauthorizedError("Invalid token"))
+      return
+    }
+
+    req.user = { id: decoded.sub }
     next()
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {

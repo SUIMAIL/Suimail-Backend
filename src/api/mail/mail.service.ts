@@ -1,4 +1,4 @@
-import Mail, { IMail } from "../../models/mail.model"
+import Mail from "../../models/mail.model"
 import { getFromWalrus, sendToWalrus } from "../../utils/walrus"
 import { UserService } from "../user/user.service"
 import { decryptData, encryptData } from "../../utils/encryption"
@@ -35,13 +35,13 @@ export class MailService {
   }
 
   async sendMail({
-    senderAddress,
+    senderId,
     recipientAddress,
     subject,
     body,
     files,
   }: {
-    senderAddress: string
+    senderId: string
     recipientAddress: string
     subject: string
     body: string
@@ -58,6 +58,9 @@ export class MailService {
       }
       recipientAddress = recipientUser.address
     }
+    const senderAddress = await this.userService.getUserWalletAddressById(
+      senderId
+    )
 
     try {
       const encryptedBody = encryptData(body)
@@ -117,22 +120,18 @@ export class MailService {
     await mail.save()
   }
 
-  async fetchInboxByUserAddress(address: string) {
-    if (!(await this.userService.findByAddress(address)))
-      throw new NotFoundError("User not found", {
-        address,
-      })
+  async fetchInboxByUserId(id: string) {
+    if (!(await this.userService.findById(id)))
+      throw new NotFoundError("User not found")
 
-    return await Mail.find({ recipientAddress: address })
+    return await Mail.find({ recipientId: id })
   }
 
-  async fetchOutBoxByUserAddress(address: string) {
-    if (!(await this.userService.findByAddress(address)))
-      throw new NotFoundError("User not found", {
-        address,
-      })
+  async fetchOutBoxByUserId(id: string) {
+    if (!(await this.userService.findById(id)))
+      throw new NotFoundError("User not found")
 
-    return await Mail.find({ senderAddress: address })
+    return await Mail.find({ senderId: id })
   }
 
   async fetchMailById(id: string): Promise<MailResponseDto> {
@@ -153,8 +152,6 @@ export class MailService {
         return {
           blobId: mail.blobId,
           subject: mail.subject,
-          senderAddress: mail.senderAddress,
-          recipientAddress: mail.recipientAddress,
           body: decryptedPayload,
         }
 
@@ -172,8 +169,6 @@ export class MailService {
       return {
         blobId: mail.blobId,
         subject: mail.subject,
-        senderAddress: mail.senderAddress,
-        recipientAddress: mail.recipientAddress,
         body: decryptedPayload,
         attachments,
       }
@@ -184,16 +179,13 @@ export class MailService {
     }
   }
 
-  async getAddressListFeatures(
-    recipientAddress: string,
-    senderAddress: string
-  ) {
+  async getAddressListFeatures(recipientAddress: string, senderId: string) {
     const recipientUser = await this.userService.findByAddress(recipientAddress)
-    if (!recipientUser)
-      throw new NotFoundError("User not found", { address: recipientAddress })
+    if (!recipientUser) throw new NotFoundError("User not found")
 
-    if (!(await this.userService.findByAddress(senderAddress)))
-      throw new NotFoundError("User not found", { address: senderAddress })
+    const senderAddress = await this.userService.getUserWalletAddressById(
+      senderId
+    )
 
     const recipientUserWhitelist = recipientUser.whitelist
     const recipientUserBlacklist = recipientUser.blacklist
