@@ -8,8 +8,8 @@ const authController = new AuthController()
 
 /**
  * @swagger
- * /user/login:
- *   post:
+ * /auth/login:
+ *   get:
  *     summary: Login a user
  *     tags: [Auth]
  *     requestBody:

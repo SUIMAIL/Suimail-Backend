@@ -12,7 +12,7 @@ const userController = new UserController()
 
 /**
  * @swagger
- * /user/suimailNs:
+ * /user/suimailns:
  *   get:
  *     summary: Get user's Suimail namespace
  *     tags: [User]
@@ -26,11 +26,11 @@ const userController = new UserController()
  *       500:
  *         description: Server error
  */
-userRouter.get("/suimailNs", userController.getUserSuimailNs)
+userRouter.get("/suimailns", userController.getUserSuimailNs)
 
 /**
  * @swagger
- * /user/suimailNs:
+ * /user/suimailns:
  *   post:
  *     summary: Update user's Suimail namespace
  *     tags: [User]
@@ -55,14 +55,14 @@ userRouter.get("/suimailNs", userController.getUserSuimailNs)
  *         description: Server error
  */
 userRouter.post(
-  "/suimailNs",
+  "/suimailns",
   validateRequest(updateUserSuimailNsSchema, "body"),
   userController.updateUserSuimailNs
 )
 
 /**
  * @swagger
- * /user/mailFee:
+ * /user/mailfee:
  *   get:
  *     summary: Get user's mail fee
  *     tags: [User]
@@ -76,11 +76,11 @@ userRouter.post(
  *       500:
  *         description: Server error
  */
-userRouter.get("/mailFee", userController.getUserMailFee)
+userRouter.get("/mailfee", userController.getUserMailFee)
 
 /**
  * @swagger
- * /user/mailFee:
+ * /user/mailfee:
  *   post:
  *     summary: Update user's mail fee
  *     tags: [User]
@@ -105,7 +105,7 @@ userRouter.get("/mailFee", userController.getUserMailFee)
  *         description: Server error
  */
 userRouter.post(
-  "/mailFee",
+  "/mailfee",
   validateRequest(updateUserMailFeeSchema, "body"),
   userController.updateUserMailFee
 )
