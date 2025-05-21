@@ -6,6 +6,7 @@ export interface IMail extends Document {
   senderId: string
   recipientId: string
   body: string
+  starred: boolean
   attachments?: {
     blobId: string
     fileName: string
@@ -44,6 +45,11 @@ const MailSchema: Schema = new Schema(
       type: String,
       required: true,
       description: "Main content/body of the mail",
+    },
+    starred: {
+      type: Boolean,
+      default: false,
+      description: "Whether the mail is starred",
     },
     attachments: [
       {

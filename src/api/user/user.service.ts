@@ -1,5 +1,4 @@
 import User, { IUser } from "../../models/user.model"
-import { generateRandomSuiNs } from "../../utils/helpers"
 import {
   BadRequestError,
   ConflictError,
@@ -12,8 +11,7 @@ export class UserService {
       throw new ConflictError("User already exists", { address })
     }
 
-    const suimailNs = await generateRandomSuiNs()
-    return await User.create({ address, suimailNs })
+    return await User.create({ address })
   }
 
   async findByAddress(address: string): Promise<IUser | null> {
@@ -46,11 +44,11 @@ export class UserService {
     return await User.findOne({ suimailNs })
   }
 
-  async getUserSuimailNs(id: string): Promise<string> {
+  async getUserSuimailNs(id: string): Promise<string | null> {
     const user = await this.findById(id)
     if (!user) throw new NotFoundError("User not found")
 
-    if (!user.suimailNs) throw new NotFoundError("Suimail namespace not set")
+    if (!user.suimailNs) return null
 
     return user.suimailNs
   }
@@ -67,9 +65,6 @@ export class UserService {
     const user = await this.findById(id)
 
     if (!user) throw new NotFoundError("User not found")
-
-    if (suimailNs.length > 10)
-      throw new BadRequestError("Suimail namespace too long")
 
     if (await this.findBySuimailNs(suimailNs))
       throw new ConflictError("Suimail namespace already exists")

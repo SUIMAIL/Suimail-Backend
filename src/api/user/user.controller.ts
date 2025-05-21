@@ -1,5 +1,6 @@
 import { Request, RequestHandler, Response, NextFunction } from "express"
 import { UserService } from "./user.service"
+import { ConflictError } from "../../utils/AppError"
 
 export class UserController {
   private userService: UserService
@@ -29,7 +30,9 @@ export class UserController {
   ) => {
     try {
       const { address } = req.params
-      const suimailNs = await this.userService.getUserSuimailNsByAddress(address)
+      const suimailNs = await this.userService.getUserSuimailNsByAddress(
+        address
+      )
       res.status(200).json({ suimailNs })
     } catch (error) {
       next(error)
@@ -44,6 +47,11 @@ export class UserController {
     try {
       const { id } = req.user!
       const { suimailNs } = req.body
+      const currentSuimailNS = await this.userService.getUserSuimailNs(id)
+
+      if (currentSuimailNS)
+        throw new ConflictError("Suimail namespace already set")
+
       await this.userService.updateUserSuimailNs(id, suimailNs)
       res.status(200).json({ message: "Suimail namespace updated" })
     } catch (error) {

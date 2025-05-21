@@ -19,7 +19,7 @@ const UserSchema: Schema = new Schema(
     },
     suimailNs: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
       description: "Suimail namespace of the user",
     },

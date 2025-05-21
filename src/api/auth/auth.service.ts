@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken"
 import { UserService } from "../user/user.service"
 import { JWT_EXPIRES, JWT_SECRET } from "../../config/envs"
 import { JWTPayload } from "../../types/global"
+import { NotFoundError } from "../../utils/AppError"
+import { IUser } from "../../models/user.model"
 
 export class AuthService {
   private userService: UserService
@@ -33,5 +35,11 @@ export class AuthService {
       algorithm: "HS256",
       expiresIn: JWT_EXPIRES! as jwt.SignOptions["expiresIn"],
     })
+  }
+
+  async getMe(id: string): Promise<IUser> {
+    const user = await this.userService.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    return user
   }
 }
