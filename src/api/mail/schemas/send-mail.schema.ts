@@ -1,8 +1,8 @@
 import joi from "joi"
 
 export const sendMailSchema = joi.object({
-  recipientAddress: joi.string().required().messages({
-    "any.required": "Recipient address is required",
+  recipient: joi.string().required().messages({
+    "any.required": "Recipient is required",
   }),
   subject: joi.string().required().messages({
     "any.required": "Subject is required",

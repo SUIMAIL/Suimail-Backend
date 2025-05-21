@@ -15,8 +15,8 @@ export class MailService {
   async create(
     blobId: string,
     subject: string,
-    senderAddress: string,
-    recipientAddress: string,
+    senderId: string,
+    recipientId: string,
     body: string,
     attachments: {
       blobId: string
@@ -27,8 +27,8 @@ export class MailService {
     return await Mail.create({
       blobId,
       subject,
-      senderAddress,
-      recipientAddress,
+      senderId,
+      recipientId,
       body,
       attachments,
     })
@@ -36,39 +36,37 @@ export class MailService {
 
   async sendMail({
     senderId,
-    recipientAddress,
+    recipient,
     subject,
     body,
     files,
   }: {
     senderId: string
-    recipientAddress: string
+    recipient: string
     subject: string
     body: string
     files: Express.Multer.File[]
   }): Promise<void> {
-    if (recipientAddress.endsWith("@suimail")) {
-      const recipientUser = await this.userService.findBySuimailNs(
-        recipientAddress
-      )
-      if (!recipientUser) {
-        throw new NotFoundError("Recipient not found", {
-          address: recipientAddress,
-        })
-      }
-      recipientAddress = recipientUser.address
+    const recipientUser = await this.userService.findBySuimailNs(recipient)
+    if (!recipientUser) {
+      throw new NotFoundError("Recipient not found", {
+        address: recipient,
+      })
     }
-    const senderAddress = await this.userService.getUserWalletAddressById(
-      senderId
-    )
+    const recipientId = recipientUser.id
+
+    const senderUser = await this.userService.findById(senderId)
+    if (!senderUser) {
+      throw new NotFoundError("Sender not found", {
+        id: senderId,
+      })
+    }
 
     try {
       const encryptedBody = encryptData(body)
       const payload = `${encryptedBody}!!!${Date.now()}`
 
       const walrusBlob = await sendToWalrus(payload)
-      console.log(walrusBlob)
-
       const blobId = walrusBlob.newlyCreated.blobObject.blobId
 
       const attachments: {
@@ -96,13 +94,11 @@ export class MailService {
         })
       )
 
-      console.log(attachments)
-
       await this.create(
         blobId,
         subject,
-        senderAddress,
-        recipientAddress,
+        senderId,
+        recipientId,
         encryptedBody,
         attachments
       )

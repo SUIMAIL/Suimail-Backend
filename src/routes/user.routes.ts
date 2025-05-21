@@ -26,7 +26,30 @@ const userController = new UserController()
  *       500:
  *         description: Server error
  */
-userRouter.get("/suimailns", userController.getUserSuimailNs)
+userRouter.get("/suimailns", userController.getActiveUserSuimailNs)
+
+/**
+ * @swagger
+ * /user/suimailns/{address}:
+ *   get:
+ *     summary: Get user's Suimail namespace by address
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: address
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The address of the user
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user's Suimail namespace
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+userRouter.get("/suimailns/:address", userController.getUserSuimailNs)
 
 /**
  * @swagger
@@ -77,6 +100,29 @@ userRouter.post(
  *         description: Server error
  */
 userRouter.get("/mailfee", userController.getUserMailFee)
+
+/**
+ * @swagger
+ * /user/mailfee/{address}:
+ *   get:
+ *     summary: Get user's mail fee by address
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: address
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The address of the user
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user's mail fee
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+userRouter.get("/mailfee/:address", userController.getUserMailFeeByAddress)
 
 /**
  * @swagger

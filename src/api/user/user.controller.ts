@@ -8,7 +8,7 @@ export class UserController {
     this.userService = new UserService()
   }
 
-  getUserSuimailNs: RequestHandler = async (
+  getActiveUserSuimailNs: RequestHandler = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -16,6 +16,20 @@ export class UserController {
     try {
       const { id } = req.user!
       const suimailNs = await this.userService.getUserSuimailNs(id)
+      res.status(200).json({ suimailNs })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getUserSuimailNs: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { address } = req.params
+      const suimailNs = await this.userService.getUserSuimailNsByAddress(address)
       res.status(200).json({ suimailNs })
     } catch (error) {
       next(error)
@@ -45,6 +59,20 @@ export class UserController {
     try {
       const { id } = req.user!
       const mailFee = await this.userService.getMailFee(id)
+      res.status(200).json({ mailFee })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getUserMailFeeByAddress: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { address } = req.params
+      const mailFee = await this.userService.getMailFeeByAddress(address)
       res.status(200).json({ mailFee })
     } catch (error) {
       next(error)

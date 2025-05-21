@@ -18,12 +18,12 @@ export class MailController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { recipientAddress, subject, body } = req.body
+      const { recipient, subject, body } = req.body
       const files = req.files as Express.Multer.File[]
       const from = req.user!.id
 
       await this.mailService.sendMail({
-        recipientAddress,
+        recipient,
         senderId: from,
         subject,
         body,
