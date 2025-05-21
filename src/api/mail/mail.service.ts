@@ -1,9 +1,18 @@
-import Mail from "../../models/mail.model"
+import Mail, { IMail } from "../../models/mail.model"
 import { getFromWalrus, sendToWalrus } from "../../utils/walrus"
 import { UserService } from "../user/user.service"
 import { decryptData, encryptData } from "../../utils/encryption"
 import { InternalServerError, NotFoundError } from "../../utils/AppError"
 import { MailResponseDto } from "./schemas/mail-response.dto"
+
+interface PopulatedUser {
+  suimailNs: string
+}
+
+interface PopulatedMail extends Omit<IMail, "senderId" | "recipientId"> {
+  senderId: PopulatedUser
+  recipientId: PopulatedUser
+}
 
 export class MailService {
   private userService: UserService
@@ -120,19 +129,91 @@ export class MailService {
     if (!(await this.userService.findById(id)))
       throw new NotFoundError("User not found")
 
-    return await Mail.find({ recipientId: id })
+    const inbox = await Mail.find({ recipientId: id })
+      .populate([
+        {
+          path: "recipientId",
+          select: "suimailNs",
+        },
+        {
+          path: "senderId",
+          select: "suimailNs",
+        },
+      ])
+      .lean()
+
+    return inbox.map((mail) => ({
+      id: mail._id.toString(),
+      subject: mail.subject,
+      senderId: { suimailNs: (mail.senderId as any).suimailNs },
+      recipientId: { suimailNs: (mail.recipientId as any).suimailNs },
+      createdAt: mail.createdAt,
+      attachments: mail.attachments?.map((att) => ({
+        fileName: att.fileName,
+        fileType: att.fileType,
+        content: att.blobId,
+      })),
+      readAt: mail.readAt,
+    }))
   }
 
   async fetchOutBoxByUserId(id: string) {
     if (!(await this.userService.findById(id)))
       throw new NotFoundError("User not found")
 
-    return await Mail.find({ senderId: id })
+    const outbox = await Mail.find({ senderId: id })
+      .populate([
+        {
+          path: "recipientId",
+          select: "suimailNs",
+        },
+        {
+          path: "senderId",
+          select: "suimailNs",
+        },
+      ])
+      .lean()
+
+    return outbox.map((mail) => ({
+      id: mail._id.toString(),
+      subject: mail.subject,
+      senderId: { suimailNs: (mail.senderId as any).suimailNs },
+      recipientId: { suimailNs: (mail.recipientId as any).suimailNs },
+      createdAt: mail.createdAt,
+      attachments: mail.attachments?.map((att) => ({
+        fileName: att.fileName,
+        fileType: att.fileType,
+        content: att.blobId,
+      })),
+      readAt: mail.readAt,
+    }))
   }
 
-  async fetchMailById(id: string): Promise<MailResponseDto> {
+  async fetchMailById(id: string): Promise<
+    Pick<IMail, "id" | "subject" | "body" | "createdAt"> & {
+      sender: {
+        suimailNs: string
+      }
+      recipient: {
+        suimailNs: string
+      }
+      attachments?: {
+        fileName: string
+        fileType: string
+        content: string
+      }[]
+    }
+  > {
     try {
-      const mail = await Mail.findById(id)
+      const mail = (await Mail.findById(id)
+        .populate({
+          path: "recipientId",
+          select: "suimailNs",
+        })
+        .populate({
+          path: "senderId",
+          select: "suimailNs",
+        })) as PopulatedMail | null
 
       if (!mail)
         throw new NotFoundError("Mail not found", {
@@ -140,16 +221,26 @@ export class MailService {
         })
 
       const blobId = mail.blobId
-      const payload = await getFromWalrus(blobId)
 
+      const payload = await getFromWalrus(blobId)
       const decryptedPayload = decryptData(payload.message)
 
-      if (!mail.attachments?.length)
-        return {
-          blobId: mail.blobId,
-          subject: mail.subject,
-          body: decryptedPayload,
-        }
+      const baseResponse = {
+        id: mail.id,
+        subject: mail.subject,
+        body: decryptedPayload,
+        createdAt: mail.createdAt,
+        sender: {
+          suimailNs: mail.senderId.suimailNs,
+        },
+        recipient: {
+          suimailNs: mail.recipientId.suimailNs,
+        },
+      }
+
+      if (!mail.attachments?.length) {
+        return baseResponse
+      }
 
       const attachments = await Promise.all(
         mail.attachments.map(async (attachment) => {
@@ -163,9 +254,7 @@ export class MailService {
       )
 
       return {
-        blobId: mail.blobId,
-        subject: mail.subject,
-        body: decryptedPayload,
+        ...baseResponse,
         attachments,
       }
     } catch (error) {

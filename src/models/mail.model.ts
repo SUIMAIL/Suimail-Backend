@@ -14,6 +14,8 @@ export interface IMail extends Document {
   }[]
 
   readAt?: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 const MailSchema: Schema = new Schema(
