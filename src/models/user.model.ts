@@ -25,7 +25,7 @@ const UserSchema: Schema = new Schema(
     },
     mailFee: {
       type: Number,
-      required: false,
+      required: true,
       default: 0,
       description: "Mail fee of the user in SUI",
     },

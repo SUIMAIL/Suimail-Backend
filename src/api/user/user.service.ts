@@ -53,14 +53,13 @@ export class UserService {
     return user.suimailNs
   }
 
-  async getUserSuimailNsByAddress(address: string): Promise<string> {
-    const user = await this.findByAddress(address)
+  async getAddressBySuimailNs(suimailNs: string): Promise<string> {
+    const user = await this.findBySuimailNs(suimailNs)
     if (!user) throw new NotFoundError("User not found")
 
-    if (!user.suimailNs) throw new NotFoundError("Suimail namespace not set")
-
-    return user.suimailNs
+    return user.address
   }
+
   async updateUserSuimailNs(id: string, suimailNs: string): Promise<void> {
     const user = await this.findById(id)
 
@@ -84,8 +83,8 @@ export class UserService {
     return user.mailFee
   }
 
-  async getMailFeeByAddress(address: string): Promise<number> {
-    const user = await this.findByAddress(address)
+  async getMailFeeBySuimailNs(suimailNs: string): Promise<number> {
+    const user = await this.findBySuimailNs(suimailNs)
 
     if (!user) throw new NotFoundError("User not found")
 

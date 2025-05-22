@@ -23,17 +23,15 @@ export class UserController {
     }
   }
 
-  getUserSuimailNs: RequestHandler = async (
+  getAddressBySuimailNs: RequestHandler = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { address } = req.params
-      const suimailNs = await this.userService.getUserSuimailNsByAddress(
-        address
-      )
-      res.status(200).json({ suimailNs })
+      const { suimailns } = req.params
+      const address = await this.userService.getAddressBySuimailNs(suimailns)
+      res.status(200).json({ address })
     } catch (error) {
       next(error)
     }
@@ -73,14 +71,14 @@ export class UserController {
     }
   }
 
-  getUserMailFeeByAddress: RequestHandler = async (
+  getMailFeeBySuimailNs: RequestHandler = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { address } = req.params
-      const mailFee = await this.userService.getMailFeeByAddress(address)
+      const { suimailns } = req.params
+      const mailFee = await this.userService.getMailFeeBySuimailNs(suimailns)
       res.status(200).json({ mailFee })
     } catch (error) {
       next(error)

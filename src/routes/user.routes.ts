@@ -30,26 +30,26 @@ userRouter.get("/suimailns", userController.getActiveUserSuimailNs)
 
 /**
  * @swagger
- * /user/suimailns/{address}:
+ * /user/{suimailns}/address:
  *   get:
- *     summary: Get user's Suimail namespace by address
+ *     summary: Get user's address by Suimail namespace
  *     tags: [User]
  *     parameters:
  *       - in: path
- *         name: address
+ *         name: suimailns
  *         required: true
  *         schema:
  *           type: string
- *         description: The address of the user
+ *         description: The Suimail namespace of the user
  *     responses:
  *       200:
- *         description: Successfully retrieved user's Suimail namespace
+ *         description: Successfully retrieved user's address
  *       401:
  *         description: Unauthorized
  *       500:
  *         description: Server error
  */
-userRouter.get("/suimailns/:address", userController.getUserSuimailNs)
+userRouter.get("/:suimailns/address", userController.getAddressBySuimailNs)
 
 /**
  * @swagger
@@ -103,17 +103,17 @@ userRouter.get("/mailfee", userController.getUserMailFee)
 
 /**
  * @swagger
- * /user/mailfee/{address}:
+ * /user/{suimailns}/mailfee:
  *   get:
- *     summary: Get user's mail fee by address
+ *     summary: Get user's mail fee by Suimail namespace
  *     tags: [User]
  *     parameters:
  *       - in: path
- *         name: address
+ *         name: suimailns
  *         required: true
  *         schema:
  *           type: string
- *         description: The address of the user
+ *         description: The Suimail namespace of the user
  *     responses:
  *       200:
  *         description: Successfully retrieved user's mail fee
@@ -122,7 +122,7 @@ userRouter.get("/mailfee", userController.getUserMailFee)
  *       500:
  *         description: Server error
  */
-userRouter.get("/mailfee/:address", userController.getUserMailFeeByAddress)
+userRouter.get("/:suimailns/mailfee", userController.getMailFeeBySuimailNs)
 
 /**
  * @swagger
