@@ -60,10 +60,12 @@ export class UserService {
     return user.address
   }
 
-  async updateUserSuimailNs(id: string, suimailNs: string): Promise<void> {
+  async setUserSuimailNs(id: string, suimailNs: string): Promise<void> {
     const user = await this.findById(id)
 
     if (!user) throw new NotFoundError("User not found")
+
+    if (user.suimailNs) throw new ConflictError("Suimail namespace already set")
 
     if (await this.findBySuimailNs(suimailNs))
       throw new ConflictError("Suimail namespace already exists")

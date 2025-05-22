@@ -80,7 +80,7 @@ userRouter.get("/:suimailns/address", userController.getAddressBySuimailNs)
 userRouter.post(
   "/suimailns",
   validateRequest(updateUserSuimailNsSchema, "body"),
-  userController.updateUserSuimailNs
+  userController.setUserSuimailNs
 )
 
 /**

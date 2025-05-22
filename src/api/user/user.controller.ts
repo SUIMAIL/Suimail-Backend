@@ -37,7 +37,7 @@ export class UserController {
     }
   }
 
-  updateUserSuimailNs: RequestHandler = async (
+  setUserSuimailNs: RequestHandler = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -45,13 +45,8 @@ export class UserController {
     try {
       const { id } = req.user!
       const { suimailNs } = req.body
-      const currentSuimailNS = await this.userService.getUserSuimailNs(id)
-
-      if (currentSuimailNS)
-        throw new ConflictError("Suimail namespace already set")
-
-      await this.userService.updateUserSuimailNs(id, suimailNs)
-      res.status(200).json({ message: "Suimail namespace updated" })
+      await this.userService.setUserSuimailNs(id, suimailNs)
+      res.status(200).json({ message: "Suimail namespace set" })
     } catch (error) {
       next(error)
     }
