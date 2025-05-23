@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose"
 
 export interface IMail extends Document {
   blobId: string
+  digest?: string
   subject: string
   senderId: string
   recipientId: string
@@ -25,6 +26,11 @@ const MailSchema: Schema = new Schema(
       required: true,
       unique: true,
       description: "Unique identifier for the mail content blob",
+    },
+    digest: {
+      type: String,
+      required: false,
+      description: "Digest of Transaction creating Escrow",
     },
     subject: {
       type: String,
