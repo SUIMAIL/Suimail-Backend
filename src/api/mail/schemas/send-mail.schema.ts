@@ -10,4 +10,7 @@ export const sendMailSchema = joi.object({
   body: joi.string().required().messages({
     "any.required": "Body is required",
   }),
+  digest: joi.string().optional().messages({
+    "any.required": "Digest is optional",
+  }),
 })
