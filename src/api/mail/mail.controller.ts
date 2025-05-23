@@ -18,7 +18,7 @@ export class MailController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { recipient, subject, body } = req.body
+      const { recipient, subject, body, digest } = req.body
       const files = req.files as Express.Multer.File[]
       const from = req.user!.id
 
@@ -28,6 +28,7 @@ export class MailController {
         subject,
         body,
         files,
+        digest,
       })
       res.status(200).json({ message: "Mail sent successfully" })
     } catch (error) {
@@ -40,9 +41,13 @@ export class MailController {
     res: Response,
     next: NextFunction
   ) => {
-    const { id } = req.user!
-    const inbox = await this.mailService.fetchInboxByUserId(id)
-    res.status(200).json(MailListResponseDto.fromEntities(inbox))
+    try {
+      const { id } = req.user!
+      const inbox = await this.mailService.fetchInboxByUserId(id)
+      res.status(200).json(MailListResponseDto.fromEntities(inbox))
+    } catch (error) {
+      next(error)
+    }
   }
 
   fetchOutBox: RequestHandler = async (
@@ -66,7 +71,8 @@ export class MailController {
   ) => {
     try {
       const { id } = req.params
-      const mail = await this.mailService.fetchMailById(id)
+      const userId = req.user!.id
+      const mail = await this.mailService.fetchMailById(id, userId)
       res.status(200).json(MailResponseDto.fullFromEntity(mail))
     } catch (error) {
       next(error)

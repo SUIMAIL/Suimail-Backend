@@ -7,6 +7,7 @@ import { MailResponseDto } from "./schemas/mail-response.dto"
 
 interface PopulatedUser {
   suimailNs: string
+  id: string
 }
 
 interface PopulatedMail extends Omit<IMail, "senderId" | "recipientId"> {
@@ -27,6 +28,7 @@ export class MailService {
     senderId: string,
     recipientId: string,
     body: string,
+    digest: string,
     attachments: {
       blobId: string
       fileName: string
@@ -39,6 +41,7 @@ export class MailService {
       senderId,
       recipientId,
       body,
+      digest,
       attachments,
     })
   }
@@ -49,12 +52,14 @@ export class MailService {
     subject,
     body,
     files,
+    digest,
   }: {
     senderId: string
     recipient: string
     subject: string
     body: string
     files: Express.Multer.File[]
+    digest: string
   }): Promise<void> {
     const recipientUser = await this.userService.findBySuimailNs(recipient)
     if (!recipientUser) {
@@ -109,6 +114,7 @@ export class MailService {
         senderId,
         recipientId,
         encryptedBody,
+        digest,
         attachments
       )
     } catch (error) {
@@ -189,8 +195,11 @@ export class MailService {
     }))
   }
 
-  async fetchMailById(id: string): Promise<
-    Pick<IMail, "id" | "subject" | "body" | "createdAt"> & {
+  async fetchMailById(
+    id: string,
+    userId: string
+  ): Promise<
+    Pick<IMail, "id" | "subject" | "body" | "createdAt" | "digest"> & {
       sender: {
         suimailNs: string
       }
@@ -208,11 +217,11 @@ export class MailService {
       const mail = (await Mail.findById(id)
         .populate({
           path: "recipientId",
-          select: "suimailNs",
+          select: "suimailNs id",
         })
         .populate({
           path: "senderId",
-          select: "suimailNs",
+          select: "suimailNs id",
         })) as PopulatedMail | null
 
       if (!mail)
@@ -225,7 +234,15 @@ export class MailService {
       const payload = await getFromWalrus(blobId)
       const decryptedPayload = decryptData(payload.message)
 
-      const baseResponse = {
+      const baseResponse: {
+        id: string
+        subject: string
+        body: string
+        createdAt: Date
+        sender: { suimailNs: string }
+        recipient: { suimailNs: string }
+        digest?: string
+      } = {
         id: mail.id,
         subject: mail.subject,
         body: decryptedPayload,
@@ -236,6 +253,10 @@ export class MailService {
         recipient: {
           suimailNs: mail.recipientId.suimailNs,
         },
+      }
+
+      if (mail.recipientId.id === userId) {
+        baseResponse["digest"] = mail.digest
       }
 
       if (!mail.attachments?.length) {

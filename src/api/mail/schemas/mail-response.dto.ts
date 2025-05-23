@@ -11,7 +11,10 @@ type Attachment = {
   content: string
 }
 
-type BaseMailFields = Pick<IMail, "id" | "subject" | "body" | "createdAt">
+type BaseMailFields = Pick<
+  IMail,
+  "id" | "subject" | "body" | "createdAt" | "digest"
+>
 
 type MailWithPopulatedFields = BaseMailFields & {
   sender: SuimailUser
@@ -39,6 +42,7 @@ export class MailResponseDto {
     this.id = mail.id
     this.subject = mail.subject
     this.body = mail.body
+    this.digest = mail.digest
     this.createdAt = mail.createdAt
     this.attachments = attachments
     this.sender = sender
@@ -48,6 +52,7 @@ export class MailResponseDto {
   id: string
   subject: string
   body: string
+  digest?: string
   createdAt: Date
   sender: SuimailUser
   recipient: SuimailUser
