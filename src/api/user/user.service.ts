@@ -106,47 +106,104 @@ export class UserService {
     await user.save()
   }
 
-  async updateUserWhitelist(
-    id: string,
-    whitelistAddresses: string[]
-  ): Promise<void> {
+  async updateUserWhitelist(id: string, suimailNs: string): Promise<void> {
     const user = await this.findById(id)
 
     if (!user) throw new NotFoundError("User not found")
 
-    if (whitelistAddresses.some((address) => address === user.address))
+    if (suimailNs === user.suimailNs)
       throw new BadRequestError("Cannot whitelist self")
 
-    const filteredWhitelist = whitelistAddresses.filter(
-      (address) => !user.whitelist.includes(address)
-    )
-
-    if (filteredWhitelist.length > 0) {
-      user.whitelist = [...user.whitelist, ...filteredWhitelist]
-      await user.save()
+    if (!(await this.findBySuimailNs(suimailNs))) {
+      throw new NotFoundError("Suimail namespace not found")
     }
+
+    if (user.whitelist.includes(suimailNs)) {
+      throw new ConflictError("Suimail namespace already in whitelist")
+    }
+
+    if (user.blacklist.includes(suimailNs)) {
+      user.blacklist = user.blacklist.filter((ns) => ns !== suimailNs)
+    }
+
+    user.whitelist = [...user.whitelist, suimailNs]
+    await user.save()
     return
   }
 
-  async updateUserBlacklist(
-    id: string,
-    blacklistAddresses: string[]
-  ): Promise<void> {
+  async updateUserBlacklist(id: string, suimailNs: string): Promise<void> {
     const user = await this.findById(id)
 
     if (!user) throw new NotFoundError("User not found")
 
-    if (blacklistAddresses.some((address) => address === user.address))
+    if (suimailNs === user.suimailNs)
       throw new BadRequestError("Cannot blacklist self")
 
-    const filteredBlacklist = blacklistAddresses.filter(
-      (address) => !user.blacklist.includes(address)
-    )
-
-    if (filteredBlacklist.length > 0) {
-      user.blacklist = [...user.blacklist, ...filteredBlacklist]
-      await user.save()
+    if (!(await this.findBySuimailNs(suimailNs))) {
+      throw new NotFoundError("Suimail namespace not found")
     }
+
+    if (user.whitelist.includes(suimailNs)) {
+      user.whitelist = user.whitelist.filter((ns) => ns !== suimailNs)
+    }
+
+    user.blacklist = [...user.blacklist, suimailNs]
+    await user.save()
     return
+  }
+
+  async getUserWhitelist(id: string): Promise<string[]> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    return user.whitelist
+  }
+
+  async getUserBlacklist(id: string): Promise<string[]> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    return user.blacklist
+  }
+
+  async removeUserWhitelist(id: string, suimailNs: string): Promise<void> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    user.whitelist = user.whitelist.filter((ns) => ns !== suimailNs)
+    await user.save()
+    return
+  }
+
+  async removeUserBlacklist(id: string, suimailNs: string): Promise<void> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    user.blacklist = user.blacklist.filter((ns) => ns !== suimailNs)
+    await user.save()
+    return
+  }
+
+  async getAddressListFeatures(recipientSuimailNs: string, senderId: string) {
+    const recipientUser = await this.findBySuimailNs(recipientSuimailNs)
+    if (!recipientUser) throw new NotFoundError("User not found")
+
+    const senderSuimailNs = await this.getUserSuimailNs(senderId)
+
+    const recipientUserWhitelist = recipientUser.whitelist
+    const recipientUserBlacklist = recipientUser.blacklist
+
+    let senderIsWhitelisted = false
+    let senderIsBlacklisted = false
+
+    if (
+      recipientUserWhitelist.some((suimailNs) => suimailNs === senderSuimailNs)
+    ) {
+      senderIsWhitelisted = true
+    }
+
+    if (
+      recipientUserBlacklist.some((suimailNs) => suimailNs === senderSuimailNs)
+    ) {
+      senderIsBlacklisted = true
+    }
+
+    return { senderIsWhitelisted, senderIsBlacklisted }
   }
 }

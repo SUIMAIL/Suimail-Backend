@@ -263,29 +263,4 @@ export class MailService {
       })
     }
   }
-
-  async getAddressListFeatures(recipientAddress: string, senderId: string) {
-    const recipientUser = await this.userService.findByAddress(recipientAddress)
-    if (!recipientUser) throw new NotFoundError("User not found")
-
-    const senderAddress = await this.userService.getUserWalletAddressById(
-      senderId
-    )
-
-    const recipientUserWhitelist = recipientUser.whitelist
-    const recipientUserBlacklist = recipientUser.blacklist
-
-    let senderIsWhitelisted = false
-    let senderIsBlacklisted = false
-
-    if (recipientUserWhitelist.some((address) => address === senderAddress)) {
-      senderIsWhitelisted = true
-    }
-
-    if (recipientUserBlacklist.some((address) => address === senderAddress)) {
-      senderIsBlacklisted = true
-    }
-
-    return { senderIsWhitelisted, senderIsBlacklisted }
-  }
 }

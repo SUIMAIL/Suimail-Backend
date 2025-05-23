@@ -3,7 +3,6 @@ import upload from "../middlewares/attachment.middleware"
 import { MailController } from "../api/mail/mail.controller"
 import { sendMailSchema } from "../api/mail/schemas/send-mail.schema"
 import { validateRequest } from "../middlewares/validation/validation.middleware"
-import { getAddressListFeaturesSchema } from "../api/mail/schemas/get-address-list-features.schema"
 
 const mailRouter = express.Router()
 const mailController = new MailController()
@@ -108,52 +107,5 @@ mailRouter.get("/outbox/me", mailController.fetchOutBox)
  *         description: Failed to fetch mail
  */
 mailRouter.get("/:id", mailController.fetchMail)
-
-/**
- * @swagger
- * /mail/get-address-list-features/{address}:
- *   get:
- *     summary: Get address list features for a user
- *     tags: [Mail]
- *     parameters:
- *       - in: path
- *         name: address
- *         required: true
- *         schema:
- *           type: string
- *         description: User wallet address
- *     responses:
- *       200:
- *         description: Address list features fetched successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 whitelist:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: List of whitelisted addresses
- *                 blacklist:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: List of blacklisted addresses
- *                 mailFee:
- *                   type: number
- *                   description: Mail fee in SUI
- *       400:
- *         description: Invalid address parameter
- *       404:
- *         description: User not found
- *       500:
- *         description: Failed to fetch address list features
- */
-mailRouter.get(
-  "/get-address-list-features/:address",
-  validateRequest(getAddressListFeaturesSchema, "params"),
-  mailController.getAddressListFeatures
-)
 
 export default mailRouter
