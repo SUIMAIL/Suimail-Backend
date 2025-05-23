@@ -4,12 +4,6 @@ import {
   MailListResponseDto,
 } from "./schemas/mail-response.dto"
 import { MailService } from "./mail.service"
-import { Document } from "mongoose"
-import { IMail } from "../../models/mail.model"
-
-type SuimailUser = {
-  suimailNs: string
-}
 
 export class MailController {
   private mailService: MailService
@@ -74,24 +68,6 @@ export class MailController {
       const { id } = req.params
       const mail = await this.mailService.fetchMailById(id)
       res.status(200).json(MailResponseDto.fullFromEntity(mail))
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  getAddressListFeatures: RequestHandler = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const senderId = req.user!.id
-      const recipientAddress = req.params.address
-      const addressListFeatures = await this.mailService.getAddressListFeatures(
-        recipientAddress,
-        senderId
-      )
-      res.status(200).json(addressListFeatures)
     } catch (error) {
       next(error)
     }

@@ -31,20 +31,14 @@ export const updateUserMailFeeSchema = joi.object({
 })
 
 export const updateUserFilterListSchema = joi.object({
-  addresses: joi
-    .array()
-    .items(
-      joi
-        .string()
-        .pattern(/^0x[a-fA-F0-9]{64}$/)
-        .messages({
-          "string.pattern.base": "Each address must be a valid SUI address",
-        })
-    )
-    .min(1)
+  suimailNs: joi
+    .string()
+    .pattern(/^[a-zA-Z0-9][a-zA-Z0-9.]*[a-zA-Z0-9]@suimail$/)
+    .messages({
+      "string.pattern.base": "Suimail namespace must be a valid format",
+    })
     .required()
     .messages({
-      "array.min": "At least one address is required",
-      "any.required": "Array of wallet addresses is required",
+      "any.required": "Suimail namespace is required",
     }),
 })
