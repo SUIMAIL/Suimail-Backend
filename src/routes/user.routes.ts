@@ -351,4 +351,8 @@ userRouter.get("/blacklist", userController.getUserBlacklist)
  */
 userRouter.get("/listed-status/:suimailns", userController.getListedStatus)
 
+userRouter.get("/image-url", userController.getUserImageUrl)
+
+userRouter.post("/image-url", userController.setUserImageUrl)
+
 export default userRouter

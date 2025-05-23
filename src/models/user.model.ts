@@ -4,6 +4,7 @@ export interface IUser extends Document {
   address: string
   suimailNs: string
   mailFee?: number
+  imageUrl?: string
   whitelist: string[]
   blacklist: string[]
   authTokenVersion: number
@@ -27,6 +28,11 @@ const UserSchema: Schema = new Schema(
       required: true,
       default: 0,
       description: "Mail fee of the user in SUI",
+    },
+    imageUrl: {
+      type: String,
+      required: false,
+      description: "Image URL of the user",
     },
     whitelist: {
       type: [String],

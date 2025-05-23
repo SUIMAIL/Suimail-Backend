@@ -200,4 +200,33 @@ export class UserController {
       next(error)
     }
   }
+
+  setUserImageUrl: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.user!
+      const { imageUrl } = req.body
+      await this.userService.setUserImageUrl(id, imageUrl)
+      res.status(200).json({ message: "Image URL set" })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  getUserImageUrl: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.user!
+      const imageUrl = await this.userService.getUserImageUrl(id)
+      res.status(200).json({ imageUrl })
+    } catch (error) {
+      next(error)
+    }
+  }
 }

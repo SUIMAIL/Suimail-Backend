@@ -206,4 +206,18 @@ export class UserService {
 
     return { senderIsWhitelisted, senderIsBlacklisted }
   }
+
+  async setUserImageUrl(id: string, imageUrl: string): Promise<void> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    user.imageUrl = imageUrl
+    await user.save()
+    return
+  }
+
+  async getUserImageUrl(id: string): Promise<string | null> {
+    const user = await this.findById(id)
+    if (!user) throw new NotFoundError("User not found")
+    return user.imageUrl ?? null
+  }
 }
