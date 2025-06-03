@@ -6,7 +6,7 @@ const sendToWalrus = async (
 ) => {
   try {
     const uploadToWalrus = await axios.put(
-      "https://walrus-publisher-testnet.n1stake.com/v1/blobs",
+      "https://wal-publisher-testnet.staketab.org/v1/blobs",
       {
         message: payload,
       },
