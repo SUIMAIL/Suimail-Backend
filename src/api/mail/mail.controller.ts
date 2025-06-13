@@ -78,4 +78,49 @@ export class MailController {
       next(error)
     }
   }
+
+  markMailsAsRead: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { mailIds } = req.body
+      const userId = req.user!.id
+      await this.mailService.markManyAsRead(mailIds, userId)
+      res.status(200).json({ message: "Mails marked as read" })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  deleteMailsForSender: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { mailIds } = req.body
+      const userId = req.user!.id
+      await this.mailService.deleteManyMailsForSender(mailIds, userId)
+      res.status(200).json({ message: "Mails deleted" })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  deleteMailsForRecipient: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { mailIds } = req.body
+      const userId = req.user!.id
+      await this.mailService.deleteManyMailsForRecipient(mailIds, userId)
+      res.status(200).json({ message: "Mails deleted" })
+    } catch (error) {
+      next(error)
+    }
+  }
 }

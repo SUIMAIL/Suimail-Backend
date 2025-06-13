@@ -108,4 +108,94 @@ mailRouter.get("/outbox/me", mailController.fetchOutBox)
  */
 mailRouter.get("/:id", mailController.fetchMail)
 
+/**
+ * @swagger
+ * /mail/read-many:
+ *   post:
+ *     summary: Mark many mails as read
+ *     tags: [Mail]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mailIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Mails marked as read
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to mark mails as read
+ */
+mailRouter.post("/read-many", mailController.markMailsAsRead)
+
+/**
+ * @swagger
+ * /mail/sender/delete-many:
+ *   delete:
+ *     summary: Delete many mails for sender
+ *     tags: [Mail]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mailIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Mails deleted
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to delete mails
+ */
+mailRouter.delete("/sender/delete-many", mailController.deleteMailsForSender)
+
+/**
+ * @swagger
+ * /mail/recipient/delete-many:
+ *   delete:
+ *     summary: Delete many mails for recipient
+ *     tags: [Mail]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mailIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Mails deleted
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to delete mails
+ */
+mailRouter.delete(
+  "/recipient/delete-many",
+  mailController.deleteMailsForRecipient
+)
+
 export default mailRouter

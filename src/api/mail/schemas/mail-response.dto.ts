@@ -17,27 +17,30 @@ type BaseMailFields = Pick<
 >
 
 type MailWithPopulatedFields = BaseMailFields & {
-  sender: SuimailUser
-  recipient: SuimailUser
+  sender: SuimailUser | null
+  recipient: SuimailUser | null
   attachments?: Attachment[]
+  metadata?: IMail["metadata"]
 }
 
 type MailListItem = {
   id: string
   subject: string
-  sender: SuimailUser
-  recipient: SuimailUser
+  sender: SuimailUser | null
+  recipient: SuimailUser | null
   createdAt: Date
   attachmentCount: number
   readAt?: Date
+  metadata?: IMail["metadata"]
 }
 
 export class MailResponseDto {
   constructor(
     mail: BaseMailFields,
-    sender: SuimailUser,
-    recipient: SuimailUser,
-    attachments?: Attachment[]
+    sender: SuimailUser | null,
+    recipient: SuimailUser | null,
+    attachments?: Attachment[],
+    metadata?: IMail["metadata"]
   ) {
     this.id = mail.id
     this.subject = mail.subject
@@ -47,6 +50,7 @@ export class MailResponseDto {
     this.attachments = attachments
     this.sender = sender
     this.recipient = recipient
+    this.metadata = metadata
   }
 
   id: string
@@ -54,19 +58,24 @@ export class MailResponseDto {
   body: string
   digest?: string
   createdAt: Date
-  sender: SuimailUser
-  recipient: SuimailUser
+  sender: SuimailUser | null
+  recipient: SuimailUser | null
   attachments?: Attachment[]
+  metadata?: IMail["metadata"]
 
   static fromEntity(
     mail: IMail,
     attachments?: Attachment[]
-  ): Pick<MailListItem, "id" | "subject" | "createdAt" | "attachmentCount"> {
+  ): Pick<
+    MailListItem,
+    "id" | "subject" | "createdAt" | "attachmentCount" | "metadata"
+  > {
     return {
       id: mail.id,
       subject: mail.subject,
       createdAt: mail.createdAt,
       attachmentCount: attachments?.length ?? 0,
+      metadata: mail.metadata,
     }
   }
 
@@ -75,7 +84,8 @@ export class MailResponseDto {
       mail,
       mail.sender,
       mail.recipient,
-      mail.attachments
+      mail.attachments,
+      mail.metadata
     )
   }
 }
@@ -93,11 +103,12 @@ export class MailListResponseDto {
     mails: Array<{
       id: string
       subject: string
-      senderId: SuimailUser
-      recipientId: SuimailUser
+      senderId: SuimailUser | null
+      recipientId: SuimailUser | null
       createdAt: Date
       attachments?: Attachment[]
       readAt?: Date
+      metadata?: IMail["metadata"]
     }>
   ): MailListResponseDto {
     return new MailListResponseDto(
@@ -109,6 +120,7 @@ export class MailListResponseDto {
         createdAt: mail.createdAt,
         attachmentCount: mail.attachments?.length ?? 0,
         readAt: mail.readAt,
+        metadata: mail.metadata,
       })),
       mails.length
     )

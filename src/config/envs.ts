@@ -9,6 +9,7 @@ export const {
   JWT_SECRET,
   JWT_EXPIRES,
   MONGO_DB_NAME,
+  COINGECKO_API_KEY,
 } = process.env
 
 const requiredEnvs = [
@@ -18,6 +19,7 @@ const requiredEnvs = [
   JWT_SECRET,
   JWT_EXPIRES,
   MONGO_DB_NAME,
+  COINGECKO_API_KEY,
 ]
 
 if (requiredEnvs.some((env) => !env)) {

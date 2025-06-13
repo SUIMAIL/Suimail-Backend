@@ -13,6 +13,14 @@ export interface IMail extends Document {
     fileName: string
     fileType: string
   }[]
+  metadata?: {
+    sender: {
+      identifier: string
+    }
+    recipient: {
+      identifier: string
+    }
+  }
 
   readAt?: Date
   createdAt: Date
@@ -40,13 +48,13 @@ const MailSchema: Schema = new Schema(
     senderId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
       description: "ID of the mail sender",
     },
     recipientId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
       description: "ID of the mail recipient",
     },
     body: {
@@ -82,6 +90,11 @@ const MailSchema: Schema = new Schema(
       type: Date,
       required: false,
       description: "Date and time the mail was read",
+    },
+    metadata: {
+      type: Schema.Types.Mixed,
+      required: false,
+      description: "Metadata of the mail",
     },
   },
   {

@@ -22,19 +22,29 @@ export class MailService {
     this.userService = new UserService()
   }
 
-  async create(
-    blobId: string,
-    subject: string,
-    senderId: string,
-    recipientId: string,
-    body: string,
-    digest: string,
+  async create({
+    blobId,
+    subject,
+    senderId,
+    recipientId,
+    body,
+    digest,
+    attachments,
+    metadata,
+  }: {
+    blobId: string
+    subject: string
+    senderId: string
+    recipientId: string
+    body: string
+    digest: string
     attachments: {
       blobId: string
       fileName: string
       fileType: string
     }[]
-  ) {
+    metadata: IMail["metadata"]
+  }) {
     return await Mail.create({
       blobId,
       subject,
@@ -43,6 +53,7 @@ export class MailService {
       body,
       digest,
       attachments,
+      metadata,
     })
   }
 
@@ -108,15 +119,23 @@ export class MailService {
         })
       )
 
-      await this.create(
+      await this.create({
         blobId,
         subject,
         senderId,
         recipientId,
-        encryptedBody,
+        body: encryptedBody,
         digest,
-        attachments
-      )
+        attachments,
+        metadata: {
+          sender: {
+            identifier: senderUser.suimailNs,
+          },
+          recipient: {
+            identifier: recipientUser.suimailNs,
+          },
+        },
+      })
     } catch (error) {
       throw new InternalServerError("Failed to send mail", {
         error,
@@ -124,11 +143,24 @@ export class MailService {
     }
   }
 
-  async markAsRead(mailId: string, address: string): Promise<void> {
-    const mail = await Mail.findOne({ _id: mailId, recipientAddress: address })
+  private async markAsRead(mailId: string, userId: string): Promise<void> {
+    const mail = await Mail.findOne({ _id: mailId, recipientId: userId })
     if (!mail) throw new NotFoundError("Mail not found", { id: mailId })
     mail.readAt = new Date()
     await mail.save()
+  }
+
+  async markManyAsRead(mailIds: string[], userId: string): Promise<void> {
+    const result = await Mail.updateMany(
+      { _id: { $in: mailIds }, recipientId: userId },
+      { readAt: new Date() }
+    )
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError("Mails not found", {
+        ids: mailIds,
+      })
+    }
   }
 
   async fetchInboxByUserId(id: string) {
@@ -151,8 +183,12 @@ export class MailService {
     return inbox.map((mail) => ({
       id: mail._id.toString(),
       subject: mail.subject,
-      senderId: { suimailNs: (mail.senderId as any).suimailNs },
-      recipientId: { suimailNs: (mail.recipientId as any).suimailNs },
+      senderId: mail.senderId
+        ? { suimailNs: (mail.senderId as any).suimailNs }
+        : null,
+      recipientId: mail.recipientId
+        ? { suimailNs: (mail.recipientId as any).suimailNs }
+        : null,
       createdAt: mail.createdAt,
       attachments: mail.attachments?.map((att) => ({
         fileName: att.fileName,
@@ -160,6 +196,7 @@ export class MailService {
         content: att.blobId,
       })),
       readAt: mail.readAt,
+      metadata: mail.metadata,
     }))
   }
 
@@ -183,8 +220,12 @@ export class MailService {
     return outbox.map((mail) => ({
       id: mail._id.toString(),
       subject: mail.subject,
-      senderId: { suimailNs: (mail.senderId as any).suimailNs },
-      recipientId: { suimailNs: (mail.recipientId as any).suimailNs },
+      senderId: mail.senderId
+        ? { suimailNs: (mail.senderId as any).suimailNs }
+        : null,
+      recipientId: mail.recipientId
+        ? { suimailNs: (mail.recipientId as any).suimailNs }
+        : null,
       createdAt: mail.createdAt,
       attachments: mail.attachments?.map((att) => ({
         fileName: att.fileName,
@@ -192,6 +233,7 @@ export class MailService {
         content: att.blobId,
       })),
       readAt: mail.readAt,
+      metadata: mail.metadata,
     }))
   }
 
@@ -259,6 +301,10 @@ export class MailService {
         baseResponse["digest"] = mail.digest
       }
 
+      if (!mail.readAt) {
+        void this.markAsRead(id, userId)
+      }
+
       if (!mail.attachments?.length) {
         return baseResponse
       }
@@ -283,5 +329,74 @@ export class MailService {
         error,
       })
     }
+  }
+
+  private async deleteMailsWithNullSenderOrRecipient(): Promise<void> {
+    await Mail.deleteMany({
+      $and: [{ senderId: null }, { recipientId: null }],
+    })
+  }
+
+  async deleteManyMailsForSender(
+    mailIds: string[],
+    userId: string
+  ): Promise<void> {
+    const mails = await Mail.find({
+      _id: { $in: mailIds },
+      senderId: userId,
+    })
+
+    if (mails.length === 0) {
+      throw new NotFoundError("Mails not found", {
+        ids: mailIds,
+      })
+    }
+
+    const result = await Mail.updateMany(
+      {
+        _id: { $in: mailIds },
+        senderId: userId,
+      },
+      {
+        senderId: null,
+      }
+    )
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError("Mails not found", {
+        ids: mailIds,
+      })
+    }
+
+    void this.deleteMailsWithNullSenderOrRecipient()
+  }
+
+  async deleteManyMailsForRecipient(
+    mailIds: string[],
+    userId: string
+  ): Promise<void> {
+    const mails = await Mail.find({
+      _id: { $in: mailIds },
+      recipientId: userId,
+    })
+
+    if (mails.length === 0) {
+      throw new NotFoundError("Mails not found", {
+        ids: mailIds,
+      })
+    }
+
+    const result = await Mail.updateMany(
+      { _id: { $in: mailIds }, recipientId: userId },
+      { recipientId: null }
+    )
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError("Mails not found", {
+        ids: mailIds,
+      })
+    }
+
+    void this.deleteMailsWithNullSenderOrRecipient()
   }
 }
