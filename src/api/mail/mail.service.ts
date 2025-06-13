@@ -302,7 +302,7 @@ export class MailService {
       }
 
       if (!mail.readAt) {
-        void this.markAsRead(id, userId)
+        await this.markAsRead(id, userId)
       }
 
       if (!mail.attachments?.length) {
@@ -368,7 +368,7 @@ export class MailService {
       })
     }
 
-    void this.deleteMailsWithNullSenderOrRecipient()
+    await this.deleteMailsWithNullSenderOrRecipient()
   }
 
   async deleteManyMailsForRecipient(
@@ -397,6 +397,6 @@ export class MailService {
       })
     }
 
-    void this.deleteMailsWithNullSenderOrRecipient()
+    await this.deleteMailsWithNullSenderOrRecipient()
   }
 }
