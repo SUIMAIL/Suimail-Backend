@@ -11,8 +11,8 @@ interface PopulatedUser {
 }
 
 interface PopulatedMail extends Omit<IMail, "senderId" | "recipientId"> {
-  senderId: PopulatedUser
-  recipientId: PopulatedUser
+  senderId: PopulatedUser | null
+  recipientId: PopulatedUser | null
 }
 
 export class MailService {
@@ -143,8 +143,8 @@ export class MailService {
     }
   }
 
-  private async markAsRead(mailId: string, userId: string): Promise<void> {
-    const mail = await Mail.findOne({ _id: mailId, recipientId: userId })
+  private async markAsRead(mailId: string): Promise<void> {
+    const mail = await Mail.findOne({ _id: mailId })
     if (!mail) throw new NotFoundError("Mail not found", { id: mailId })
     mail.readAt = new Date()
     await mail.save()
@@ -290,19 +290,23 @@ export class MailService {
         body: decryptedPayload,
         createdAt: mail.createdAt,
         sender: {
-          suimailNs: mail.senderId.suimailNs,
+          suimailNs:
+            mail.senderId?.suimailNs || mail.metadata?.sender.identifier || "",
         },
         recipient: {
-          suimailNs: mail.recipientId.suimailNs,
+          suimailNs:
+            mail.recipientId?.suimailNs ||
+            mail.metadata?.recipient.identifier ||
+            "",
         },
       }
 
-      if (mail.recipientId.id === userId) {
+      if (mail.recipientId?.id === userId) {
         baseResponse["digest"] = mail.digest
       }
 
-      if (!mail.readAt) {
-        await this.markAsRead(id, userId)
+      if (!mail.readAt && mail.recipientId?.id === userId) {
+        await this.markAsRead(id)
       }
 
       if (!mail.attachments?.length) {
