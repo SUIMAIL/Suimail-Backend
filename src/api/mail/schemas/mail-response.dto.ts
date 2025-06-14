@@ -3,6 +3,7 @@ import { IMail } from '../../../models/mail.model';
 // Common types
 type SuimailUser = {
   suimailNs: string;
+  imageUrl?: string;
 };
 
 type Attachment = {

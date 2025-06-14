@@ -7,6 +7,7 @@ import { InternalServerError, NotFoundError } from '../../utils/AppError';
 interface PopulatedUser {
   suimailNs: string;
   id: string;
+  imageUrl?: string;
 }
 
 interface PopulatedMail extends Omit<IMail, 'senderId' | 'recipientId'> {
@@ -169,11 +170,11 @@ export class MailService {
       .populate([
         {
           path: 'recipientId',
-          select: 'suimailNs',
+          select: 'suimailNs imageUrl',
         },
         {
           path: 'senderId',
-          select: 'suimailNs',
+          select: 'suimailNs imageUrl',
         },
       ])
       .lean();
@@ -181,8 +182,15 @@ export class MailService {
     return inbox.map(mail => ({
       id: mail._id.toString(),
       subject: mail.subject,
-      senderId: mail.senderId ? { suimailNs: (mail.senderId as any).suimailNs } : null,
-      recipientId: mail.recipientId ? { suimailNs: (mail.recipientId as any).suimailNs } : null,
+      senderId: mail.senderId
+        ? { suimailNs: (mail.senderId as any).suimailNs, imageUrl: (mail.senderId as any).imageUrl }
+        : null,
+      recipientId: mail.recipientId
+        ? {
+            suimailNs: (mail.recipientId as any).suimailNs,
+            imageUrl: (mail.recipientId as any).imageUrl,
+          }
+        : null,
       createdAt: mail.createdAt,
       attachments: mail.attachments?.map(att => ({
         fileName: att.fileName,
@@ -201,11 +209,11 @@ export class MailService {
       .populate([
         {
           path: 'recipientId',
-          select: 'suimailNs',
+          select: 'suimailNs imageUrl',
         },
         {
           path: 'senderId',
-          select: 'suimailNs',
+          select: 'suimailNs imageUrl',
         },
       ])
       .lean();
@@ -213,8 +221,15 @@ export class MailService {
     return outbox.map(mail => ({
       id: mail._id.toString(),
       subject: mail.subject,
-      senderId: mail.senderId ? { suimailNs: (mail.senderId as any).suimailNs } : null,
-      recipientId: mail.recipientId ? { suimailNs: (mail.recipientId as any).suimailNs } : null,
+      senderId: mail.senderId
+        ? { suimailNs: (mail.senderId as any).suimailNs, imageUrl: (mail.senderId as any).imageUrl }
+        : null,
+      recipientId: mail.recipientId
+        ? {
+            suimailNs: (mail.recipientId as any).suimailNs,
+            imageUrl: (mail.recipientId as any).imageUrl,
+          }
+        : null,
       createdAt: mail.createdAt,
       attachments: mail.attachments?.map(att => ({
         fileName: att.fileName,
@@ -233,9 +248,11 @@ export class MailService {
     Pick<IMail, 'id' | 'subject' | 'body' | 'createdAt' | 'digest'> & {
       sender: {
         suimailNs: string;
+        imageUrl?: string;
       };
       recipient: {
         suimailNs: string;
+        imageUrl?: string;
       };
       attachments?: {
         fileName: string;
@@ -248,11 +265,11 @@ export class MailService {
       const mail = (await Mail.findById(id)
         .populate({
           path: 'recipientId',
-          select: 'suimailNs id',
+          select: 'suimailNs id imageUrl',
         })
         .populate({
           path: 'senderId',
-          select: 'suimailNs id',
+          select: 'suimailNs id imageUrl',
         })) as PopulatedMail | null;
 
       if (!mail)
@@ -270,8 +287,8 @@ export class MailService {
         subject: string;
         body: string;
         createdAt: Date;
-        sender: { suimailNs: string };
-        recipient: { suimailNs: string };
+        sender: { suimailNs: string; imageUrl?: string };
+        recipient: { suimailNs: string; imageUrl?: string };
         digest?: string;
       } = {
         id: mail.id,
@@ -280,9 +297,11 @@ export class MailService {
         createdAt: mail.createdAt,
         sender: {
           suimailNs: mail.senderId?.suimailNs || mail.metadata?.sender.identifier || '',
+          imageUrl: mail.senderId?.imageUrl,
         },
         recipient: {
           suimailNs: mail.recipientId?.suimailNs || mail.metadata?.recipient.identifier || '',
+          imageUrl: mail.recipientId?.imageUrl,
         },
       };
 
