@@ -1,14 +1,14 @@
-import express from "express"
-import { UserController } from "../api/user/user.controller"
-import { validateRequest } from "../middlewares/validation/validation.middleware"
+import express from 'express';
+import { UserController } from '../api/user/user.controller';
+import { validateRequest } from '../middlewares/validation/validation.middleware';
 import {
   updateUserFilterListSchema,
   updateUserMailFeeSchema,
   updateUserSuimailNsSchema,
-} from "../api/user/schemas/update-user.schema"
+} from '../api/user/schemas/update-user.schema';
 
-const userRouter = express.Router()
-const userController = new UserController()
+const userRouter = express.Router();
+const userController = new UserController();
 
 /**
  * @swagger
@@ -26,7 +26,7 @@ const userController = new UserController()
  *       500:
  *         description: Server error
  */
-userRouter.get("/suimailns", userController.getActiveUserSuimailNs)
+userRouter.get('/suimailns', userController.getActiveUserSuimailNs);
 
 /**
  * @swagger
@@ -49,7 +49,7 @@ userRouter.get("/suimailns", userController.getActiveUserSuimailNs)
  *       500:
  *         description: Server error
  */
-userRouter.get("/:suimailns/address", userController.getAddressBySuimailNs)
+userRouter.get('/:suimailns/address', userController.getAddressBySuimailNs);
 
 /**
  * @swagger
@@ -78,10 +78,10 @@ userRouter.get("/:suimailns/address", userController.getAddressBySuimailNs)
  *         description: Server error
  */
 userRouter.post(
-  "/suimailns",
-  validateRequest(updateUserSuimailNsSchema, "body"),
-  userController.setUserSuimailNs
-)
+  '/suimailns',
+  validateRequest(updateUserSuimailNsSchema, 'body'),
+  userController.setUserSuimailNs,
+);
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ userRouter.post(
  *       500:
  *         description: Server error
  */
-userRouter.get("/mailfee", userController.getUserMailFee)
+userRouter.get('/mailfee', userController.getUserMailFee);
 
 /**
  * @swagger
@@ -122,7 +122,7 @@ userRouter.get("/mailfee", userController.getUserMailFee)
  *       500:
  *         description: Server error
  */
-userRouter.get("/:suimailns/mailfee", userController.getMailFeeBySuimailNs)
+userRouter.get('/:suimailns/mailfee', userController.getMailFeeBySuimailNs);
 
 /**
  * @swagger
@@ -151,10 +151,10 @@ userRouter.get("/:suimailns/mailfee", userController.getMailFeeBySuimailNs)
  *         description: Server error
  */
 userRouter.post(
-  "/mailfee",
-  validateRequest(updateUserMailFeeSchema, "body"),
-  userController.updateUserMailFee
-)
+  '/mailfee',
+  validateRequest(updateUserMailFeeSchema, 'body'),
+  userController.updateUserMailFee,
+);
 
 /**
  * @swagger
@@ -185,10 +185,10 @@ userRouter.post(
  *         description: Server error
  */
 userRouter.post(
-  "/whitelist",
-  validateRequest(updateUserFilterListSchema, "body"),
-  userController.updateUserWhitelist
-)
+  '/whitelist',
+  validateRequest(updateUserFilterListSchema, 'body'),
+  userController.updateUserWhitelist,
+);
 
 /**
  * @swagger
@@ -219,10 +219,10 @@ userRouter.post(
  *         description: Server error
  */
 userRouter.post(
-  "/whitelist/remove",
-  validateRequest(updateUserFilterListSchema, "body"),
-  userController.removeUserWhitelist
-)
+  '/whitelist/remove',
+  validateRequest(updateUserFilterListSchema, 'body'),
+  userController.removeUserWhitelist,
+);
 
 /**
  * @swagger
@@ -253,10 +253,10 @@ userRouter.post(
  *         description: Server error
  */
 userRouter.post(
-  "/blacklist",
-  validateRequest(updateUserFilterListSchema, "body"),
-  userController.updateUserBlacklist
-)
+  '/blacklist',
+  validateRequest(updateUserFilterListSchema, 'body'),
+  userController.updateUserBlacklist,
+);
 
 /**
  * @swagger
@@ -287,10 +287,10 @@ userRouter.post(
  *         description: Server error
  */
 userRouter.post(
-  "/blacklist/remove",
-  validateRequest(updateUserFilterListSchema, "body"),
-  userController.removeUserBlacklist
-)
+  '/blacklist/remove',
+  validateRequest(updateUserFilterListSchema, 'body'),
+  userController.removeUserBlacklist,
+);
 
 /**
  * @swagger
@@ -308,7 +308,7 @@ userRouter.post(
  *       500:
  *         description: Server error
  */
-userRouter.get("/whitelist", userController.getUserWhitelist)
+userRouter.get('/whitelist', userController.getUserWhitelist);
 
 /**
  * @swagger
@@ -326,7 +326,7 @@ userRouter.get("/whitelist", userController.getUserWhitelist)
  *       500:
  *         description: Server error
  */
-userRouter.get("/blacklist", userController.getUserBlacklist)
+userRouter.get('/blacklist', userController.getUserBlacklist);
 
 /**
  * @swagger
@@ -349,10 +349,10 @@ userRouter.get("/blacklist", userController.getUserBlacklist)
  *       500:
  *         description: Server error
  */
-userRouter.get("/listed-status/:suimailns", userController.getListedStatus)
+userRouter.get('/listed-status/:suimailns', userController.getListedStatus);
 
-userRouter.get("/image-url", userController.getUserImageUrl)
+userRouter.get('/image-url', userController.getUserImageUrl);
 
-userRouter.post("/image-url", userController.setUserImageUrl)
+userRouter.post('/image-url', userController.setUserImageUrl);
 
-export default userRouter
+export default userRouter;

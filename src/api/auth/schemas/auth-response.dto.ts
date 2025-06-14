@@ -1,15 +1,15 @@
-import { IUser } from "../../../models/user.model"
+import { IUser } from '../../../models/user.model';
 
 export class AuthResponseDto {
   constructor(user: IUser) {
-    this.suimailNs = user.suimailNs
+    this.suimailNs = user.suimailNs;
   }
 
-  suimailNs: string
+  suimailNs: string;
 
   static fromEntity(user: IUser): AuthResponseDto {
     return {
       suimailNs: user.suimailNs,
-    }
+    };
   }
 }

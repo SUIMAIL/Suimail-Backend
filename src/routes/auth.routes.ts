@@ -1,11 +1,11 @@
-import express from "express"
-import { AuthController } from "../api/auth/auth.controller"
-import { validateRequest } from "../middlewares/validation/validation.middleware"
-import { getLoginSchema } from "../api/auth/schemas/auth.schema"
-import authMiddleware from "../middlewares/auth.middleware"
+import express from 'express';
+import { AuthController } from '../api/auth/auth.controller';
+import { validateRequest } from '../middlewares/validation/validation.middleware';
+import { getLoginSchema } from '../api/auth/schemas/auth.schema';
+import authMiddleware from '../middlewares/auth.middleware';
 
-const authRouter = express.Router()
-const authController = new AuthController()
+const authRouter = express.Router();
+const authController = new AuthController();
 
 /**
  * @swagger
@@ -30,11 +30,7 @@ const authController = new AuthController()
  *       500:
  *         description: Server error
  */
-authRouter.get(
-  "/login/:address",
-  validateRequest(getLoginSchema, "params"),
-  authController.login
-)
+authRouter.get('/login/:address', validateRequest(getLoginSchema, 'params'), authController.login);
 
 /**
  * @swagger
@@ -59,6 +55,6 @@ authRouter.get(
  *       500:
  *         description: Server error
  */
-authRouter.get("/me", authMiddleware, authController.getMe)
+authRouter.get('/me', authMiddleware, authController.getMe);
 
-export default authRouter
+export default authRouter;

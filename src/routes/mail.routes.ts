@@ -1,11 +1,11 @@
-import express from "express"
-import upload from "../middlewares/attachment.middleware"
-import { MailController } from "../api/mail/mail.controller"
-import { sendMailSchema } from "../api/mail/schemas/send-mail.schema"
-import { validateRequest } from "../middlewares/validation/validation.middleware"
+import express from 'express';
+import upload from '../middlewares/attachment.middleware';
+import { MailController } from '../api/mail/mail.controller';
+import { sendMailSchema } from '../api/mail/schemas/send-mail.schema';
+import { validateRequest } from '../middlewares/validation/validation.middleware';
 
-const mailRouter = express.Router()
-const mailController = new MailController()
+const mailRouter = express.Router();
+const mailController = new MailController();
 /**
  * @swagger
  * /mail/send:
@@ -43,11 +43,11 @@ const mailController = new MailController()
  *         description: Failed to send mail
  */
 mailRouter.post(
-  "/send",
-  upload.array("attachments"),
-  validateRequest(sendMailSchema, "body"),
-  mailController.sendMail
-)
+  '/send',
+  upload.array('attachments'),
+  validateRequest(sendMailSchema, 'body'),
+  mailController.sendMail,
+);
 
 /**
  * @swagger
@@ -65,7 +65,7 @@ mailRouter.post(
  *       500:
  *         description: Failed to fetch inbox
  */
-mailRouter.get("/inbox/me", mailController.fetchInbox)
+mailRouter.get('/inbox/me', mailController.fetchInbox);
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ mailRouter.get("/inbox/me", mailController.fetchInbox)
  *       500:
  *         description: Failed to fetch outbox
  */
-mailRouter.get("/outbox/me", mailController.fetchOutBox)
+mailRouter.get('/outbox/me', mailController.fetchOutBox);
 
 /**
  * @swagger
@@ -106,7 +106,7 @@ mailRouter.get("/outbox/me", mailController.fetchOutBox)
  *       500:
  *         description: Failed to fetch mail
  */
-mailRouter.get("/:id", mailController.fetchMail)
+mailRouter.get('/:id', mailController.fetchMail);
 
 /**
  * @swagger
@@ -135,7 +135,7 @@ mailRouter.get("/:id", mailController.fetchMail)
  *       500:
  *         description: Failed to mark mails as read
  */
-mailRouter.post("/read-many", mailController.markMailsAsRead)
+mailRouter.post('/read-many', mailController.markMailsAsRead);
 
 /**
  * @swagger
@@ -164,7 +164,7 @@ mailRouter.post("/read-many", mailController.markMailsAsRead)
  *       500:
  *         description: Failed to delete mails
  */
-mailRouter.delete("/sender/delete-many", mailController.deleteMailsForSender)
+mailRouter.delete('/sender/delete-many', mailController.deleteMailsForSender);
 
 /**
  * @swagger
@@ -193,9 +193,54 @@ mailRouter.delete("/sender/delete-many", mailController.deleteMailsForSender)
  *       500:
  *         description: Failed to delete mails
  */
-mailRouter.delete(
-  "/recipient/delete-many",
-  mailController.deleteMailsForRecipient
-)
+mailRouter.delete('/recipient/delete-many', mailController.deleteMailsForRecipient);
 
-export default mailRouter
+/**
+ * @swagger
+ * /mail/sender/delete/{id}:
+ *   delete:
+ *     summary: Delete a mail for sender
+ *     tags: [Mail]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Mail deleted
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to delete mail
+ */
+mailRouter.delete('/sender/delete/:id', mailController.deleteMailForSender);
+
+/**
+ * @swagger
+ * /mail/recipient/delete/{id}:
+ *   delete:
+ *     summary: Delete a mail for recipient
+ *     tags: [Mail]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Mail deleted
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to delete mail
+ */
+mailRouter.delete('/recipient/delete/:id', mailController.deleteMailForRecipient);
+
+export default mailRouter;

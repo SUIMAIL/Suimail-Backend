@@ -1,6 +1,6 @@
-import dotenv from "dotenv"
+import dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
 export const {
   PORT,
@@ -10,7 +10,7 @@ export const {
   JWT_EXPIRES,
   MONGO_DB_NAME,
   COINGECKO_API_KEY,
-} = process.env
+} = process.env;
 
 const requiredEnvs = [
   PORT,
@@ -20,12 +20,8 @@ const requiredEnvs = [
   JWT_EXPIRES,
   MONGO_DB_NAME,
   COINGECKO_API_KEY,
-]
+];
 
-if (requiredEnvs.some((env) => !env)) {
-  throw new Error(
-    `Missing environment variables: ${requiredEnvs
-      .filter((env) => !env)
-      .join(", ")}`
-  )
+if (requiredEnvs.some(env => !env)) {
+  throw new Error(`Missing environment variables: ${requiredEnvs.filter(env => !env).join(', ')}`);
 }

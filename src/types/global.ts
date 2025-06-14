@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {
-      user?: { id: string }
+      user?: { id: string };
     }
   }
 }
 
 export interface JWTPayload {
-  sub: string
-  version: number
-  iat?: number
-  exp?: number
+  sub: string;
+  version: number;
+  iat?: number;
+  exp?: number;
 }
