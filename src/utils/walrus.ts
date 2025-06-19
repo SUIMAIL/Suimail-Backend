@@ -4,7 +4,7 @@ import { InternalServerError } from './AppError';
 const sendToWalrus = async (payload: string | Buffer | Buffer<ArrayBufferLike>) => {
   try {
     const uploadToWalrus = await axios.put(
-      'https://wal-publisher-testnet.staketab.org/v1/blobs',
+      'https://walrus.testnet.publisher.stakepool.dev.br/v1/blobs?epochs=50',
       {
         message: payload,
       },
